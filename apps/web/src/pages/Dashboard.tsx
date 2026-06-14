@@ -1,3 +1,7 @@
+// Tasks : 
+// 1. The starred page position has to be changed
+// 2. what the hell am i supposed to put in the option for a page (probably share and edit)
+// 3. the colors for folders has to be assigned based on the type of file (for ex green for markdown, blue for list, purple for kanban)
 import {
   MoreHorizontal,
   Search,
@@ -18,19 +22,9 @@ const pages = [
     color: '#d7a2dc',
   },
   {
-    title: 'Marketing Ideas',
-    edited: 'Edited 2 days ago',
-    color: '#c99c7b',
-  },
-  {
     title: 'Client Meeting Notes',
     edited: 'Edited 3 days ago',
     color: '#8fc2ef',
-  },
-  {
-    title: 'Brand Guidelines',
-    edited: 'Edited 5 days ago',
-    color: '#98a7f2',
   },
 ]
 

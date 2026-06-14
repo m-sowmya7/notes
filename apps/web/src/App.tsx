@@ -77,13 +77,12 @@ function App() {
             <span
               aria-hidden="true"
               className="
-                ml-[2px]
+                ml-0.5
                 translate-y-[-0.08em]
                 text-[0.5em]
                 text-[#8b735d]
-              "
-            >
-              ✦ ✦
+              ">
+              ✦ 
             </span>
           </span>
         </h1>
@@ -94,9 +93,7 @@ function App() {
             max-w-90
             text-[1.02rem]
             leading-[1.55]
-            text-[rgba(47,38,31,0.88)]
-          "
-        >
+            text-[rgba(47,38,31,0.88)]">
           Plan, organize and explore creative ideas for your projects.
         </p>
 
@@ -105,17 +102,16 @@ function App() {
           className="
         mt-7 cursor-pointer
         inline-flex items-center gap-3
-        rounded-[8px]
-        bg-gradient-to-b from-[#7c69ff] to-[#6652f0]
-        px-[22px] py-[14px]
+        rounded-lg
+        bg-linear-to-b from-[#7c69ff] to-[#6652f0]
+        px-5.5 py-3.5
         text-[1rem] font-bold text-white
         shadow-[0_18px_30px_rgba(81,67,229,0.25)]
         transition-all duration-150
-        hover:-translate-y-[1px]
+        hover:-translate-y-px
         hover:brightness-[1.02]
         hover:shadow-[0_22px_36px_rgba(81,67,229,0.3)]
         focus-visible:outline
-        focus-visible:outline-4
         focus-visible:outline-[rgba(101,82,240,0.32)]">
           Get Started
 
@@ -134,7 +130,7 @@ function App() {
           opacity-100
           shadow-[inset_0_-1px_0_rgba(93,76,56,0.1)]
           bg-[radial-gradient(circle_at_3%_0,rgba(215,194,171,0.35)_0_18px,transparent_19px),linear-gradient(180deg,rgba(223,205,184,0.88),rgba(214,194,171,0.97))]
-          [background-size:88px_22px,auto]
+          bg-size-[88px_22px,auto]
           [clip-path:polygon(0_28%,5%_38%,11%_26%,18%_44%,25%_32%,33%_48%,41%_30%,49%_42%,58%_24%,67%_44%,75%_34%,83%_48%,91%_30%,100%_40%,100%_100%,0_100%)]
         "
       />
