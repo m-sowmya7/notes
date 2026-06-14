@@ -1,11 +1,4 @@
-import {
-  ArrowLeft,
-  Star,
-  Link,
-  Share2,
-  MoreHorizontal,
-  Trash2, Loader2
-} from "lucide-react";
+import { ArrowLeft, Star, Link, Share2, MoreHorizontal, Trash2, Loader2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 
@@ -13,12 +6,14 @@ type PageToolbarProps = {
   title: string;
   isOnline: boolean;
   isSyncing: boolean;
+  isModalOpen?: boolean;
 };
 
 const PageToolbar = ({
   title,
   isOnline,
   isSyncing,
+  isModalOpen,
 }: PageToolbarProps) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -41,14 +36,17 @@ const PageToolbar = ({
 
   return (
     <header
-      className="
-        sticky top-0 z-50
-        flex items-center justify-between
-        px-6 py-3
-        bg-white/90
-        backdrop-blur
-        border-b border-neutral-200
-      "
+      className={`
+    sticky top-0 z-50
+    flex items-center justify-between
+    px-6 py-3
+    border-b border-neutral-200
+    transition-all
+    ${isModalOpen
+          ? "bg-white/40 backdrop-blur-md"
+          : "bg-white/90 backdrop-blur"
+        }
+  `}
     >
       {/* Left */}
       <div className="flex items-center gap-2">
@@ -71,47 +69,47 @@ const PageToolbar = ({
           ) : (
             <div
               className={`flex items-center gap-1 text-sm ${isOnline
-                  ? "text-green-600"
-                  : "text-neutral-500"
+                ? "text-green-600"
+                : "text-neutral-500"
                 }`}
             >
               <div
                 className={`h-2 w-2 rounded-full ${isOnline
-                    ? "bg-green-500"
-                    : "bg-neutral-400"
+                  ? "bg-green-500"
+                  : "bg-neutral-400"
                   }`}
               />
               {isOnline ? "Online" : "Offline"}
             </div>
           )}
         </div>
-        </div>
+      </div>
 
-        {/* Right */}
-        <div className="flex items-center gap-1">
-          <button className="p-2 rounded-md hover:bg-neutral-100">
-            <Share2 size={18} />
+      {/* Right */}
+      <div className="flex items-center gap-1">
+        <button className="p-2 rounded-md hover:bg-neutral-100">
+          <Share2 size={18} />
+        </button>
+
+        <button className="p-2 rounded-md hover:bg-neutral-100">
+          <Link size={18} />
+        </button>
+
+        <button className="p-2 rounded-md hover:bg-neutral-100">
+          <Star size={18} />
+        </button>
+
+        <div className="relative" ref={menuRef}>
+          <button
+            onClick={() => setOpen(!open)}
+            className="p-2 rounded-md hover:bg-neutral-100"
+          >
+            <MoreHorizontal size={18} />
           </button>
 
-          <button className="p-2 rounded-md hover:bg-neutral-100">
-            <Link size={18} />
-          </button>
-
-          <button className="p-2 rounded-md hover:bg-neutral-100">
-            <Star size={18} />
-          </button>
-
-          <div className="relative" ref={menuRef}>
-            <button
-              onClick={() => setOpen(!open)}
-              className="p-2 rounded-md hover:bg-neutral-100"
-            >
-              <MoreHorizontal size={18} />
-            </button>
-
-            {open && (
-              <div
-                className="
+          {open && (
+            <div
+              className="
                 absolute right-0 top-11
                 w-52
                 bg-white
@@ -120,21 +118,21 @@ const PageToolbar = ({
                 shadow-lg
                 py-1
               ">
-                <button
-                  className="
+              <button
+                className="
                   w-full
                   flex items-center gap-2
                   px-3 py-2
                   text-red-500
                   hover:bg-red-50
                 ">
-                  <Trash2 size={16} />
-                  Delete
-                </button>
-              </div>
-            )}
-          </div>
+                <Trash2 size={16} />
+                Delete
+              </button>
+            </div>
+          )}
         </div>
+      </div>
     </header>
   );
 };

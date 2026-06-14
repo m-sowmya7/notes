@@ -103,7 +103,7 @@ function App() {
         <Link
           to="/pages"
           className="
-        mt-7
+        mt-7 cursor-pointer
         inline-flex items-center gap-3
         rounded-[8px]
         bg-gradient-to-b from-[#7c69ff] to-[#6652f0]
@@ -116,9 +116,7 @@ function App() {
         hover:shadow-[0_22px_36px_rgba(81,67,229,0.3)]
         focus-visible:outline
         focus-visible:outline-4
-        focus-visible:outline-[rgba(101,82,240,0.32)]
-      "
-        >
+        focus-visible:outline-[rgba(101,82,240,0.32)]">
           Get Started
 
           <span aria-hidden="true">

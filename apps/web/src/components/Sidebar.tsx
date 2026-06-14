@@ -8,9 +8,8 @@ import {
   ChevronDown, NotebookPen
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
 import TemplatesModal from './TemplatesModal'
-
+import { useTemplatesModal } from '../context/TemplatesModalContext'
 const navItems = [
   {
     label: 'All Pages',
@@ -32,7 +31,11 @@ const navItems = [
 const Sidebar = () => {
   const location = useLocation()
   const navigate = useNavigate()
-  const [isTemplatesModalOpen, setIsTemplatesModalOpen] = useState(false)
+  // const [isTemplatesModalOpen, setIsTemplatesModalOpen] = useState(false)
+  const {
+  isTemplatesModalOpen,
+  setIsTemplatesModalOpen,
+} = useTemplatesModal();
 
   return (
     <aside

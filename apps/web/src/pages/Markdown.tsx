@@ -4,10 +4,14 @@ import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { SlashCommand } from "../features/editor/extensions/SlashCommand";
 import PageToolbar from "../components/PageToolbar";
-
+import { useTemplatesModal }
+  from "../context/TemplatesModalContext";
 const Markdown = () => {
   const [title, setTitle] = useState("");
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const {
+    isTemplatesModalOpen,
+  } = useTemplatesModal();
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -40,12 +44,14 @@ const Markdown = () => {
   if (!editor) return null;
 
   return (
-    <div className="w-full min-h-screen">
+    <div className={`w-full min-h-screen transition-all ${isTemplatesModalOpen ? "blur-sm" : ""}`}>
       <PageToolbar
         title={title}
-        isOnline={true}
+        isOnline={isOnline}
         isSyncing={false}
+        isModalOpen={isTemplatesModalOpen}
       />
+
       <div className="max-w-4xl mx-auto px-24 py-16">
         {/* Page Title */}
         <input

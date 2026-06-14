@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import PageToolbar from "../components/PageToolbar";
+import { useTemplatesModal } from "../context/TemplatesModalContext";
 
 type ListItem = {
   id: string;
@@ -11,6 +12,7 @@ type ListItem = {
 const List = () => {
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const { isTemplatesModalOpen } = useTemplatesModal();
   const [title, setTitle] = useState("");
   const [items, setItems] = useState<ListItem[]>([
     {
@@ -94,22 +96,109 @@ const List = () => {
     setItems((prev) => prev.filter((item) => item.id !== id));
   };
 
+  //   <div className="w-full min-h-screen">
+  //     <PageToolbar title={title} isOnline={true} isSyncing={false} isModalOpen={templateModalOpen} />
+  //     <div className="mx-auto max-w-3xl px-8 py-10">
+  //       <input
+  //         value={title}
+  //         onChange={(e) => setTitle(e.target.value)}
+  //         placeholder="Untitled List"
+  //         className="mb-8 w-full border-none bg-transparent text-gray-800 placeholder:text-gray-400 text-5xl font-bold outline-none"
+  //       />
+
+  //       <div className="space-y-2">
+  //         {items.map((item, index) => (
+  //           <div
+  //             key={item.id}
+  //             className="group flex items-center gap-3 rounded-md px-2 py-1 hover:bg-neutral-100">
+  //             <input
+  //               type="checkbox"
+  //               checked={item.completed}
+  //               onChange={() => toggleItem(item.id)}
+  //               onKeyDown={(e) => handleKeyDown(e, index)}
+  //               className="h-4 w-4 cursor-pointer"
+  //             />
+
+  //             <input
+  //               ref={(el) => {
+  //                 inputRefs.current[item.id] = el;
+  //               }}
+  //               value={item.text}
+  //               onChange={(e) => updateItem(item.id, e.target.value)}
+  //               onKeyDown={(e) => handleKeyDown(e, index)}
+  //               placeholder="List item"
+  //               className={`flex-1 bg-transparent outline-none text-lg ${item.completed
+  //                 ? "text-neutral-400 line-through"
+  //                 : "text-neutral-800"
+  //                 }`}
+  //             />
+
+  //             <button
+  //               onClick={() => deleteItem(item.id)}
+  //               className="opacity-0 transition group-hover:opacity-100 hover:text-red-500">
+  //               <Trash2 size={16} />
+  //             </button>
+  //           </div>
+  //         ))}
+  //       </div>
+
+  //       <button
+  //         onClick={addItem}
+  //         className="mt-4 flex items-center gap-2 text-sm text-neutral-500 transition hover:text-neutral-900">
+  //         <Plus size={16} />
+  //         Add Item
+  //       </button>
+  //     </div>
+  //   </div>
+  // );
   return (
-    <div className="w-full min-h-screen">
-      <PageToolbar title={title} isOnline={true} isSyncing={false} />
+    <div
+      className={`
+      w-full min-h-screen transition-all duration-200
+      ${isTemplatesModalOpen
+          ? "blur-sm pointer-events-none"
+          : ""
+        }
+    `}
+    >
+      <PageToolbar
+        title={title}
+        isOnline={isOnline}
+        isSyncing={false}
+        isModalOpen={isTemplatesModalOpen}
+      />
+
       <div className="mx-auto max-w-3xl px-8 py-10">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Untitled List"
-          className="mb-8 w-full border-none bg-transparent text-gray-800 placeholder:text-gray-400 text-5xl font-bold outline-none"
+          className="
+          mb-8
+          w-full
+          border-none
+          bg-transparent
+          text-5xl
+          font-bold
+          text-gray-800
+          outline-none
+          placeholder:text-gray-400
+        "
         />
 
         <div className="space-y-2">
           {items.map((item, index) => (
             <div
               key={item.id}
-              className="group flex items-center gap-3 rounded-md px-2 py-1 hover:bg-neutral-100">
+              className="
+              group
+              flex
+              items-center
+              gap-3
+              rounded-md
+              px-2
+              py-1
+              hover:bg-neutral-100">
               <input
                 type="checkbox"
                 checked={item.completed}
@@ -123,18 +212,34 @@ const List = () => {
                   inputRefs.current[item.id] = el;
                 }}
                 value={item.text}
-                onChange={(e) => updateItem(item.id, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(e, index)}
+                onChange={(e) =>
+                  updateItem(item.id, e.target.value)
+                }
+                onKeyDown={(e) =>
+                  handleKeyDown(e, index)
+                }
                 placeholder="List item"
-                className={`flex-1 bg-transparent outline-none text-lg ${item.completed
-                  ? "text-neutral-400 line-through"
-                  : "text-neutral-800"
-                  }`}
+                className={`
+                flex-1
+                bg-transparent
+                text-lg
+                outline-none
+                ${item.completed
+                    ? "text-neutral-400 line-through"
+                    : "text-neutral-800"
+                  }
+              `}
               />
 
               <button
                 onClick={() => deleteItem(item.id)}
-                className="opacity-0 transition group-hover:opacity-100 hover:text-red-500">
+                className="
+                opacity-0
+                transition
+                group-hover:opacity-100
+                hover:text-red-500
+              "
+              >
                 <Trash2 size={16} />
               </button>
             </div>
@@ -143,7 +248,17 @@ const List = () => {
 
         <button
           onClick={addItem}
-          className="mt-4 flex items-center gap-2 text-sm text-neutral-500 transition hover:text-neutral-900">
+          className="
+          mt-4
+          flex
+          items-center
+          gap-2
+          text-sm
+          text-neutral-500
+          transition
+          hover:text-neutral-900
+        "
+        >
           <Plus size={16} />
           Add Item
         </button>
