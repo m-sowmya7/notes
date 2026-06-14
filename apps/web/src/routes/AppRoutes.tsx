@@ -5,8 +5,8 @@ import Dashboard from '../pages/Dashboard'
 import Markdown from '../pages/Markdown'
 import List from '../pages/List'
 import Kanban from '../pages/Kanban'
-// import StarredPage from '../pages/StarredPage'
-// import TrashPage from '../pages/TrashPage'
+import StarredPage from '../pages/StarredPage'
+import TrashPage from '../pages/TrashPage'
 
 import AppLayout from '../layouts/AppLayout'
 
@@ -24,8 +24,8 @@ const AppRoutes = () => {
         <Route path="/editor/list" element={<List />} />
 
         <Route path="/editor/kanban" element={<Kanban />} />
-        {/* <Route path="/starred" element={<StarredPage />} />  */}
-         {/* <Route path="/trash" element={<TrashPage />} />  */}
+        <Route path="/starred" element={<StarredPage />} /> 
+         <Route path="/trash" element={<TrashPage />} /> 
       </Route>
     </Routes>
   )

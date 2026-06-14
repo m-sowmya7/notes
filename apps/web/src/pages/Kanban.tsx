@@ -134,8 +134,9 @@ const Kanban = () => {
             placeholder:text-neutral-400
           "
         />
+        <DeleteZone setCards={setCards} />
 
-        <div className="flex gap-6 overflow-x-auto pb-8">
+        <div className="flex gap-4 overflow-x-auto pb-8">
           <Column
             title="Backlog"
             column="backlog"
@@ -164,7 +165,7 @@ const Kanban = () => {
             setCards={setCards}
           />
 
-          <DeleteZone setCards={setCards} />
+          {/*<DeleteZone setCards={setCards} />*/}
         </div>
       </div>
     </div>
@@ -503,10 +504,10 @@ const DeleteZone = ({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={`
-        mt-8
+        mt-6 mb-6
         grid
-        h-40
-        w-72
+        h-10
+        w-full
         shrink-0
         place-content-center
         rounded-2xl
@@ -522,7 +523,7 @@ const DeleteZone = ({
     >
       <div className="flex items-center gap-2">
         <FiTrash />
-        Delete
+        Drag & Drop to Delete
       </div>
     </div>
   );

@@ -1,4 +1,9 @@
-import { useEffect, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
 import { slashItems } from "../features/editor/commands/slashItems";
 
 type Props = {
@@ -6,67 +11,64 @@ type Props = {
   command: (item: (typeof slashItems)[0]) => void;
 };
 
-const SlashCommandList = ({ items, command }: Props) => {
-  const [selectedIndex, setSelectedIndex] = useState(0);
+export interface SlashCommandListRef {
+  onKeyDown: (event: KeyboardEvent) => boolean;
+}
 
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [items]);
+const SlashCommandList = forwardRef<SlashCommandListRef, Props>(
+  ({ items, command }, ref) => {
+    const [selectedIndex, setSelectedIndex] = useState(0);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
+    useEffect(() => {
+      setSelectedIndex(0);
+    }, [items]);
 
-        setSelectedIndex(
-          (prev) => (prev + 1) % items.length
-        );
-      }
+    useImperativeHandle(ref, () => ({
+      onKeyDown: (event: KeyboardEvent) => {
+        if (event.key === "ArrowDown") {
+          setSelectedIndex(
+            (prev) => (prev + 1) % items.length
+          );
+          return true;
+        }
+        if (event.key === "ArrowUp") {
+          setSelectedIndex(
+            (prev) =>
+              (prev - 1 + items.length) % items.length
+          );
+          return true;
+        }
+        if (event.key === "Enter") {
+          command(items[selectedIndex]);
+          return true;
+        }
+        return false;
+      },
+    }));
 
-      if (e.key === "ArrowUp") {
-        e.preventDefault();
-
-        setSelectedIndex(
-          (prev) =>
-            (prev - 1 + items.length) % items.length
-        );
-      }
-
-      if (e.key === "Enter") {
-        e.preventDefault();
-        command(items[selectedIndex]);
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () =>
-      document.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
-  }, [items, selectedIndex, command]);
-
-  return (
-    <div className="w-72 rounded-xl border border-gray-200 bg-white p-2 shadow-xl">
-      {items.map((item, index) => (
-        <button
-          key={item.title}
-          onClick={() => command(item)}
-          className={`
+    return (
+      <div className="w-72 rounded-xl border border-gray-200 bg-white p-2 shadow-xl">
+        {items.map((item, index) => (
+          <button
+            key={item.title}
+            onClick={() => command(item)}
+            className={`
             w-full rounded-lg px-3 py-2 text-left hover:bg-gray-100
             ${index === selectedIndex ? "bg-gray-100" : ""}`}>
-          <div className="text-sm font-medium">
-            {item.title}
-          </div>
+            <div className="text-sm font-medium">
+              {item.title}
+            </div>
 
-          <div className="text-xs text-gray-500">
-            {item.description}
-          </div>
-        </button>
-      ))}
-    </div>
-  );
-};
+            <div className="text-xs text-gray-500">
+              {item.description}
+            </div>
+          </button>
+        ))}
+      </div>
+    );
+  }
+);
+
+SlashCommandList.displayName = "SlashCommandList";
 
 export default SlashCommandList;

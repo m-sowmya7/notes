@@ -9,9 +9,7 @@ import { useTemplatesModal }
 const Markdown = () => {
   const [title, setTitle] = useState("");
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const {
-    isTemplatesModalOpen,
-  } = useTemplatesModal();
+  const { isTemplatesModalOpen } = useTemplatesModal();
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);

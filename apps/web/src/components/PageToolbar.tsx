@@ -1,6 +1,7 @@
 import { ArrowLeft, Star, Link, Share2, MoreHorizontal, Trash2, Loader2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
+import ShareModal from "./ShareModal";
 
 type PageToolbarProps = {
   title: string;
@@ -17,6 +18,7 @@ const PageToolbar = ({
 }: PageToolbarProps) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -87,7 +89,7 @@ const PageToolbar = ({
 
       {/* Right */}
       <div className="flex items-center gap-1">
-        <button className="p-2 rounded-md hover:bg-neutral-100">
+        <button className="p-2 rounded-md hover:bg-neutral-100" onClick={() => setShareOpen(true)}>
           <Share2 size={18} />
         </button>
 
@@ -133,6 +135,11 @@ const PageToolbar = ({
           )}
         </div>
       </div>
+      <ShareModal
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        title={title}
+      />
     </header>
   );
 };

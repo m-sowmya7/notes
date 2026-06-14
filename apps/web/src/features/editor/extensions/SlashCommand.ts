@@ -6,6 +6,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 import SlashCommandList from "../../../components/SlashCommandList";
+import type { SlashCommandListRef } from "../../../components/SlashCommandList";
 import { slashItems } from "../commands/slashItems";
 
 export const SlashCommand = Extension.create({
@@ -28,27 +29,31 @@ export const SlashCommand = Extension.create({
           let component: HTMLDivElement;
           let popup: any;
           let root: ReactDOM.Root;
+          let componentRef: React.RefObject<SlashCommandListRef | null>;
+
+          const renderComponent = (props: any) => {
+            root.render(
+              React.createElement(SlashCommandList, {
+                ref: componentRef,
+                items: props.items,
+                command: (item: any) => {
+                  item.command({ editor: props.editor });
+                  popup?.[0]?.hide();
+                },
+              })
+            );
+          };
 
           return {
             onStart: (props) => {
               component = document.createElement("div");
-
+              componentRef = React.createRef<SlashCommandListRef>();
               root = ReactDOM.createRoot(component);
 
-              root.render(
-                React.createElement(SlashCommandList, {
-                  // items: slashItems,
-                  items: props.items,
-                  command: (item: any) => {
-                    item.command({ editor: props.editor });
-                    popup?.[0]?.hide();
-                  },
-                })
-              );
+              renderComponent(props);
 
               popup = tippy("body", {
-                getReferenceClientRect:
-                  props.clientRect as any,
+                getReferenceClientRect: props.clientRect as any,
                 appendTo: () => document.body,
                 content: component,
                 interactive: true,
@@ -59,10 +64,22 @@ export const SlashCommand = Extension.create({
             },
 
             onUpdate(props) {
+              renderComponent(props);
               popup[0].setProps({
                 getReferenceClientRect:
                   props.clientRect as any,
               });
+            },
+
+            onKeyDown(props) {
+              if (props.event.key === "Escape") {
+                popup[0].hide();
+                return true;
+              }
+              return (
+                componentRef?.current?.onKeyDown(props.event) ??
+                false
+              );
             },
 
             onExit() {
