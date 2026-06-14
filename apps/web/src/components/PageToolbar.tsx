@@ -1,4 +1,7 @@
-import { ArrowLeft, Star, Link, Share2, MoreHorizontal, Trash2, Loader2 } from "lucide-react";
+// Tasks : 
+// 1. conformation for delete action
+// 2. online/offline status with websocket connection and make sure sync action is showing
+import { ArrowLeft, Star, Share2, MoreHorizontal, Trash2, Loader2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import ShareModal from "./ShareModal";
@@ -19,6 +22,7 @@ const PageToolbar = ({
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -73,8 +77,7 @@ const PageToolbar = ({
               className={`flex items-center gap-1 text-sm ${isOnline
                 ? "text-green-600"
                 : "text-neutral-500"
-                }`}
-            >
+                }`}>
               <div
                 className={`h-2 w-2 rounded-full ${isOnline
                   ? "bg-green-500"
@@ -93,19 +96,22 @@ const PageToolbar = ({
           <Share2 size={18} />
         </button>
 
-        <button className="p-2 rounded-md hover:bg-neutral-100">
-          <Link size={18} />
-        </button>
-
-        <button className="p-2 rounded-md hover:bg-neutral-100">
-          <Star size={18} />
+        <button
+          onClick={() => setIsFavorite((prev) => !prev)}
+          className="p-2 rounded-md hover:bg-neutral-100">
+          <Star
+            size={18}
+            className={`transition-colors ${isFavorite
+                ? "fill-yellow-400 text-yellow-400"
+                : "text-black"
+              }`}
+          />
         </button>
 
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setOpen(!open)}
-            className="p-2 rounded-md hover:bg-neutral-100"
-          >
+            className="p-2 rounded-md hover:bg-neutral-100">
             <MoreHorizontal size={18} />
           </button>
 
@@ -118,16 +124,14 @@ const PageToolbar = ({
                 border border-neutral-200
                 rounded-xl
                 shadow-lg
-                py-1
-              ">
+                py-1">
               <button
                 className="
                   w-full
                   flex items-center gap-2
                   px-3 py-2
                   text-red-500
-                  hover:bg-red-50
-                ">
+                  hover:bg-red-50">
                 <Trash2 size={16} />
                 Delete
               </button>

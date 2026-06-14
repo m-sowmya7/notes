@@ -3,7 +3,7 @@ import Suggestion from "@tiptap/suggestion";
 import tippy from "tippy.js";
 
 import React from "react";
-import ReactDOM from "react-dom/client";
+import { createRoot, type Root } from "react-dom/client";
 
 import SlashCommandList from "../../../components/SlashCommandList";
 import type { SlashCommandListRef } from "../../../components/SlashCommandList";
@@ -28,32 +28,46 @@ export const SlashCommand = Extension.create({
         render() {
           let component: HTMLDivElement;
           let popup: any;
-          let root: ReactDOM.Root;
+          let root: Root;
+          let currentProps: any;
+
           let componentRef: React.RefObject<SlashCommandListRef | null>;
 
-          const renderComponent = (props: any) => {
+          function renderList() {
             root.render(
-              React.createElement(SlashCommandList, {
-                ref: componentRef,
-                items: props.items,
-                command: (item: any) => {
-                  item.command({ editor: props.editor });
+              <SlashCommandList
+                ref={componentRef}
+                items={currentProps.items}
+                command={(item) => {
+                  currentProps.editor
+                    .chain()
+                    .focus()
+                    .deleteRange(currentProps.range)
+                    .run();
+
+                  item.command({ editor: currentProps.editor });
+
                   popup?.[0]?.hide();
-                },
-              })
+                }}
+              />
             );
-          };
+          }
 
           return {
             onStart: (props) => {
-              component = document.createElement("div");
-              componentRef = React.createRef<SlashCommandListRef>();
-              root = ReactDOM.createRoot(component);
+              currentProps = props;
 
-              renderComponent(props);
+              component = document.createElement("div");
+              root = createRoot(component);
+
+              componentRef =
+                React.createRef<SlashCommandListRef>();
+
+              renderList();
 
               popup = tippy("body", {
-                getReferenceClientRect: props.clientRect as any,
+                getReferenceClientRect:
+                  props.clientRect as any,
                 appendTo: () => document.body,
                 content: component,
                 interactive: true,
@@ -64,7 +78,9 @@ export const SlashCommand = Extension.create({
             },
 
             onUpdate(props) {
-              renderComponent(props);
+              currentProps = props;
+              renderList();
+
               popup[0].setProps({
                 getReferenceClientRect:
                   props.clientRect as any,
@@ -76,9 +92,11 @@ export const SlashCommand = Extension.create({
                 popup[0].hide();
                 return true;
               }
+
               return (
-                componentRef?.current?.onKeyDown(props.event) ??
-                false
+                componentRef?.current?.onKeyDown(
+                  props.event
+                ) ?? false
               );
             },
 

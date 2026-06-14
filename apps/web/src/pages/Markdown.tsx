@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import { SlashCommand } from "../features/editor/extensions/SlashCommand";
+import { SlashCommand } from "../features/editor/extensions/SlashCommand.tsx";
 import PageToolbar from "../components/PageToolbar";
 import { useTemplatesModal }
   from "../context/TemplatesModalContext";

@@ -1,3 +1,6 @@
+// Tasks : 
+// 1. ofc access restrictions
+// 2. share to other apps (not necessary rn cause it makes a link)
 import { X, Copy, Eye, MessageSquare, Pencil, Check } from "lucide-react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
@@ -67,7 +70,7 @@ const ShareModal = ({
         className="w-120 rounded-2xl bg-white p-5 shadow-xl"
         onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="mb-5 flex items-center justify-between px-12 py-10">
+        <div className="mb-5 flex items-center justify-between">
           <h2 className="text-lg font-semibold">
             Share "{title || "Untitled"}"
           </h2>

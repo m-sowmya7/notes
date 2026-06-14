@@ -136,7 +136,7 @@ const Kanban = () => {
         />
         <DeleteZone setCards={setCards} />
 
-        <div className="flex gap-4 overflow-x-auto pb-8">
+        <div className="flex gap-2 overflow-x-auto pb-8">
           <Column
             title="Backlog"
             column="backlog"
@@ -165,7 +165,6 @@ const Kanban = () => {
             setCards={setCards}
           />
 
-          {/*<DeleteZone setCards={setCards} />*/}
         </div>
       </div>
     </div>
@@ -334,7 +333,7 @@ const Column = ({
   };
 
   return (
-    <div className="w-72 shrink-0">
+    <div className="w-66.5 shrink-0">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="font-semibold text-neutral-700">
           {title}
