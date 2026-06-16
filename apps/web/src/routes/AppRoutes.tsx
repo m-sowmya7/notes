@@ -20,12 +20,15 @@ const AppRoutes = () => {
       <Route element={<AppLayout />}>
         <Route path="/pages" element={<Dashboard />} />
         <Route path="/editor/plain-text" element={<Markdown />} />
-
+        <Route
+          path="/page/:id"
+          element={<Markdown />}
+        />
         <Route path="/editor/list" element={<List />} />
 
         <Route path="/editor/kanban" element={<Kanban />} />
-        <Route path="/starred" element={<StarredPage />} /> 
-         <Route path="/trash" element={<TrashPage />} /> 
+        <Route path="/starred" element={<StarredPage />} />
+        <Route path="/trash" element={<TrashPage />} />
       </Route>
     </Routes>
   )

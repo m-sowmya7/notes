@@ -2,7 +2,7 @@ import express from "express"
 import cors from "cors"
 import { config } from "dotenv"
 import { PrismaClient } from "./generated/prisma/client"
-
+import pageRoutes from "./routes/documentRoutes"
 config()
 const PORT = process.env.PORT || 5000
 const app = express()
@@ -11,9 +11,11 @@ const prisma = new PrismaClient()
 app.use(cors())
 app.use(express.json())
 
-app.get("/", (_, res) => {
-  res.json({ message: "Server running" })
-})
+// app.get("/", (_, res) => {
+//   res.json({ message: "Server running" })
+// })
+
+app.use("/api/pages", pageRoutes);
 
 async function startServer() {
   try {

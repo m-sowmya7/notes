@@ -140,6 +140,69 @@ pnpm exec prisma migrate dev --name init
 - @types/node
 - @types/ws
 
+# Backend Implementation Map
+
+This section maps frontend needs (what the web app uses or will call) to the backend files and implementations required, plus priorities and next steps.
+
+- **Realtime collaboration (HIGH)**
+  - Why: frontend uses `yjs` and `y-websocket` and shows sync/online status in UI.
+  - Implement in: `apps/server/src/websocket/yjs` (Yjs websocket server), `apps/server/src/websocket/rooms`, `apps/server/src/websocket/presence`, and `apps/server/src/services/syncService`.
+  - What to do: provide a WebSocket endpoint (e.g. `/yjs`), wire Y.Doc synchronization, persist snapshots optionally, and emit presence events.
+
+- **Presence / Online status (MEDIUM)**
+  - Why: `PageToolbar` shows online/offline and sync indicators.
+  - Implement in: `apps/server/src/websocket/presence` and `apps/server/src/websocket/rooms`.
+  - What to do: track connected users per room, expose simple presence API or ws events for the UI.
+
+- **Document CRUD and listing (HIGH)**
+  - Why: the app will need to create, fetch, update, and delete documents.
+  - Implement in: `apps/server/src/api/documents`, backed by `apps/server/src/services/documentService` and DB models in `prisma/schema.prisma` (models: `User`, `Document`, `Revision` or `Content`).
+  - Suggested endpoints: `GET /api/documents`, `GET /api/documents/:id`, `POST /api/documents`, `PUT /api/documents/:id`, `DELETE /api/documents/:id`.
+
+- **Share links and public access (MEDIUM)**
+  - Why: `ShareModal` in frontend uses share links and will request share metadata.
+  - Implement in: `apps/server/src/api/share` and `apps/server/src/services/shareService`.
+  - Suggested endpoints: `POST /api/share` (create link), `GET /api/share/:token` (resolve link), optional `DELETE /api/share/:token`.
+
+- **Permissions (MEDIUM)**
+  - Why: planned features include shared editing and permissions.
+  - Implement in: `apps/server/src/api/permissions` and DB model `Permission` in Prisma.
+  - Suggested behavior: check permission middleware on document endpoints; APIs to list/update permissions.
+
+- **Auth / User (LOW to MEDIUM)**
+  - Why: sharing and permissions need identities. If you already rely on external auth, integrate it.
+  - Implement in: `apps/server/src/middleware` (auth middleware), `apps/server/src/routes` and a `User` model in Prisma.
+
+- **Database / Persistence (HIGH if you need persistence)**
+  - Why: to persist documents, shares, permissions, and snapshots.
+  - Implement in: `apps/server/prisma/schema.prisma` (add models) and use generated client in `apps/server/src/generated/prisma`.
+  - Steps: add Prisma models, set `DATABASE_URL` in `.env`, run `prisma migrate` and `prisma generate`.
+
+- **Project scaffolding and glue (LOW)**
+  - Files/folders currently empty but recommended for structure:
+    - `apps/server/src/controllers` — HTTP handler implementations
+    - `apps/server/src/routes` — Express routes registration
+    - `apps/server/src/middleware` — auth, logging, error handling
+    - `apps/server/src/utils` — helpers
+
+Priority guidance: implement realtime + document CRUD + DB first for functional parity with frontend. Add share/permissions and auth after core flows work.
+
+Quick next steps (developer checklist):
+
+1. Add Prisma models for `User`, `Document`, `Share`, `Permission`, run migrations.
+2. Implement minimal document endpoints in `apps/server/src/api/documents` and wire to `documentService`.
+3. Start a basic Yjs websocket server in `apps/server/src/websocket/yjs` and expose `/yjs`.
+4. Add presence tracking for rooms and expose status to the frontend.
+5. Implement `share` endpoints and `shareService` to create/resolve public links.
+
+Run the server (dev):
+
+```bash
+pnpm dev:server
+```
+
+If you want, I can scaffold minimal implementations for (1) a Yjs websocket endpoint and (2) the `GET /api/documents` and `POST /api/documents` endpoints next.
+
 # Recommended Future Folder Structure
 
 ```

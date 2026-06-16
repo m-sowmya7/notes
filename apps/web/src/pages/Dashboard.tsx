@@ -2,127 +2,164 @@
 // 1. The starred page position has to be changed
 // 2. what the hell am i supposed to put in the option for a page (probably share and edit)
 // 3. the colors for folders has to be assigned based on the type of file (for ex green for markdown, blue for list, purple for kanban)
-import { MoreHorizontal, Search, ChevronDown, Star } from 'lucide-react'
+import { MoreHorizontal, Search, ChevronDown, Star } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { type Page } from "../../types/pageType";
 
-const pages = [
-  {
-    title: 'Project Planning Board',
-    edited: 'Edited 2 mins ago',
-    color: '#a8c48b',
-    starred: true,
-  },
-  {
-    title: 'Website Redesign',
-    edited: 'Edited 1 day ago',
-    color: '#d7a2dc',
-  },
-  {
-    title: 'Client Meeting Notes',
-    edited: 'Edited 3 days ago',
-    color: '#8fc2ef',
-  },
-]
+const getFolderColor = (type?: string) => {
+  switch (type) {
+    case "MARKDOWN":
+      return "#a8c48b";
+
+    case "LIST":
+      return "#8fc2ef";
+
+    case "KANBAN":
+      return "#d7a2dc";
+
+    default:
+      return "#cfcfcf";
+  }
+};
+
+const formatEditedTime = (dateString?: string) => {
+  if (!dateString) {
+    return "Recently created";
+  }
+
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMinutes = Math.floor(diffMs / 60000);
+
+  if (diffMinutes < 60) {
+    return `Edited ${diffMinutes} min ago`;
+  }
+
+  const diffHours = Math.floor(diffMinutes / 60);
+
+  if (diffHours < 24) {
+    return `Edited ${diffHours} hr ago`;
+  }
+
+  const diffDays = Math.floor(diffHours / 24);
+
+  return `Edited ${diffDays} day ago`;
+};
 
 const FolderIcon = ({ color }: { color: string }) => {
   return (
-    <svg
-      width="42"
-      height="34"
-      viewBox="0 0 42 34"
-      fill="none">
+    <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
       <path
         d="M3 9C3 6.79086 4.79086 5 7 5H15L18 8H35C37.2091 8 39 9.79086 39 12V27C39 29.2091 37.2091 31 35 31H7C4.79086 31 3 29.2091 3 27V9Z"
         fill={color}
         stroke="#4B4B4B"
         strokeWidth="1.5"
       />
-
       <path
         d="M3 11H39"
         stroke="#4B4B4B"
         strokeWidth="1.5"
       />
     </svg>
-  )
-}
+  );
+};
 
 const DashboardPage = () => {
+  const [pages, setPages] = useState<Page[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchPages = async () => {
+      try {
+        const res = await fetch(
+          "http://localhost:5000/api/pages"
+        );
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        setPages(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchPages();
+  }, []);
+
+  const sortedPages = [...pages].sort((a, b) => {
+    if (a.starred === b.starred) {
+      const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+
+      const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+
+      return dateB - dateA;
+    }
+
+    return a.starred ? -1 : 1;
+  });
+
   return (
     <main className="flex min-h-screen bg-[#f6f3ef]">
-
       <section className="flex-1 px-12 py-10">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-5xl font-black text-[#1f1f1f]">
-            All Pages
-          </h1>
-        </div>
+        <h1 className="text-5xl font-black text-[#1f1f1f]">
+          All Pages
+        </h1>
 
-        {/* Top Controls */}
         <div className="mt-8 flex items-center justify-between">
-          {/* Search */}
-          <div
-            className="
-              flex w-85 items-center gap-3
-              rounded-xl border border-neutral-200
-              bg-white px-4 py-3
-            "
-          >
+          <div className="flex w-85 items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3">
             <Search size={18} className="text-neutral-400" />
 
             <input
               type="text"
               placeholder="Search pages..."
-              className="
-                w-full bg-transparent text-sm
-                outline-none placeholder:text-neutral-400
-              "
+              className="w-full bg-transparent text-sm outline-none"
             />
           </div>
 
-          {/* Sort */}
-          <button
-            className="
-              flex items-center gap-2
-              rounded-xl border border-neutral-200
-              bg-white px-4 py-3
-              text-sm font-medium text-neutral-700
-            "
-          >
+          <button className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm">
             Last modified
             <ChevronDown size={16} />
           </button>
         </div>
 
-        {/* Pages List */}
-        <div
-          className="
-            mt-8 overflow-hidden rounded-2xl
-            border border-neutral-200 bg-white
-          "
-        >
-          {pages.map((page, index) => (
+        <div className="mt-8 overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+          {sortedPages.map((page, index) => (
             <button
-              key={page.title}
-              className={`
-                flex w-full items-center justify-between
-                px-6 py-5 text-left transition
-                hover:bg-neutral-50
-                ${index !== pages.length - 1 ? 'border-b border-neutral-100' : ''}
-              `}
-            >
+              key={page.id}
+              onClick={() =>
+                navigate(`/page/${page.id}`)
+              }
+              className={`flex w-full items-center justify-between px-6 py-5 text-left transition hover:bg-neutral-50 ${index !== sortedPages.length - 1
+                  ? "border-b border-neutral-100"
+                  : ""
+                }`}>
               <div className="flex items-center gap-5">
-                <FolderIcon color={page.color} />
+                <FolderIcon
+                  color={getFolderColor(page.type)}
+                />
 
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-semibold text-neutral-800">
+                    <h3 className="text-lg font-semibold">
                       {page.title}
                     </h3>
+
+                    {page.starred && (
+                      <Star
+                        size={15}
+                        className="fill-yellow-400 text-yellow-400"
+                      />
+                    )}
                   </div>
 
-                  <p className="mt-1 text-sm text-neutral-500">
-                    {page.edited}
+                  <p className="text-sm text-neutral-500">
+                    {formatEditedTime(page.updatedAt)}
                   </p>
                 </div>
               </div>
@@ -136,7 +173,7 @@ const DashboardPage = () => {
         </div>
       </section>
     </main>
-  )
-}
+  );
+};
 
-export default DashboardPage
+export default DashboardPage;

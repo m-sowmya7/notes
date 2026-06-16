@@ -13,3 +13,19 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Page {
+  id        String   @id @default(uuid())
+  title     String
+  type      PageType @default(MARKDOWN)
+  starred   Boolean  @default(false)
+  content   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PageType {
+  MARKDOWN
+  LIST
+  KANBAN
+}
