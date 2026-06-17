@@ -1,8 +1,10 @@
 import { prisma } from '../prisma/client';
+import { PageType } from '../../generated/prisma/enums';
 
 export const PageRepository = {
     create(data: {
         title: string;
+        type: PageType;
         content: any;
     }) {
         return prisma.page.create({

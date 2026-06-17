@@ -1,7 +1,7 @@
 // Tasks : 
-// 1. The starred page position has to be changed
+// 1. The starred page position has to be changed and starred pages should go to starred page
 // 2. what the hell am i supposed to put in the option for a page (probably share and edit)
-// 3. the colors for folders has to be assigned based on the type of file (for ex green for markdown, blue for list, purple for kanban)
+// 3. search functionality and sorting (how to sort them)
 import { MoreHorizontal, Search, ChevronDown, Star } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -133,12 +133,9 @@ const DashboardPage = () => {
             <button
               key={page.id}
               onClick={() =>
-                navigate(`/page/${page.id}`)
+                navigate(`/editor/${page.type}/${page.id}`)
               }
-              className={`flex w-full items-center justify-between px-6 py-5 text-left transition hover:bg-neutral-50 ${index !== sortedPages.length - 1
-                  ? "border-b border-neutral-100"
-                  : ""
-                }`}>
+              className={`flex w-full items-center justify-between px-6 py-5 text-left transition hover:bg-neutral-50 ${index !== sortedPages.length - 1 ? "border-b border-neutral-100" : ""}`}>
               <div className="flex items-center gap-5">
                 <FolderIcon
                   color={getFolderColor(page.type)}

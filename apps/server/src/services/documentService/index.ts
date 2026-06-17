@@ -1,8 +1,9 @@
 import { PageRepository } from '../../db/repositories/documentRepository';
+import { PageType } from '../../generated/prisma/enums';
 
 export const PageService = {
-    async createPage(title: string, content: any) {
-        return PageRepository.create({title, content});
+    async createPage(title: string, type: PageType, content: any) {
+        return PageRepository.create({title, type, content});
     },
 
     async getPages() {

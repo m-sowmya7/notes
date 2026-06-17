@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import PageToolbar from "../components/PageToolbar";
 import { useTemplatesModal } from "../context/TemplatesModalContext";
+import { useParams } from "react-router-dom";
 
 type ListItem = {
   id: string;
@@ -14,6 +15,7 @@ const List = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const { isTemplatesModalOpen } = useTemplatesModal();
   const [title, setTitle] = useState("");
+  const { id } = useParams();
   const [items, setItems] = useState<ListItem[]>([
     {
       id: crypto.randomUUID(),
@@ -21,6 +23,38 @@ const List = () => {
       completed: false,
     },
   ]);
+
+
+  useEffect(() => {
+    if (!id) return;
+
+    const loadPage = async () => {
+      const res = await fetch(`http://localhost:5000/api/pages/${id}`);
+      const page = await res.json();
+      
+      setTitle(page.title);
+      setItems(page.content.items || []);
+    };
+    loadPage();
+  },[id]);
+
+  useEffect(() => {
+    if(!id) return;
+
+    const timeOut = setTimeout(async () => {
+      await fetch(`http://localhost:5000/api/pages/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          content: { items },
+        }),
+      });
+    }, 1000);
+    return () => clearTimeout(timeOut);
+  }, [title, items, id]);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);

@@ -3,17 +3,10 @@
 // 2. enable editing the card title and tasks
 // 3. user should be able to add new columns and delete existing ones
 // 4. make components for this, currently everything is in one file for ease of development but it should be split up
-import {
-  type Dispatch,
-  type SetStateAction,
-  useEffect,
-  useState,
-  type DragEvent,
-  type FormEvent,
-} from "react";
+import { type Dispatch, type SetStateAction, useEffect, useState, type DragEvent, type FormEvent } from "react";
 import { FiPlus, FiTrash } from "react-icons/fi";
 import { motion } from "motion/react";
-
+import { useParams } from "react-router-dom";
 import PageToolbar from "../components/PageToolbar";
 import { useTemplatesModal } from "../context/TemplatesModalContext";
 
@@ -25,68 +18,60 @@ type CardType = {
   column: ColumnType;
 };
 
-const DEFAULT_CARDS: CardType[] = [
-  {
-    title: "Look into render bug in dashboard",
-    id: "1",
-    column: "backlog",
-  },
-  {
-    title: "SOX compliance checklist",
-    id: "2",
-    column: "backlog",
-  },
-  {
-    title: "[SPIKE] Migrate to Azure",
-    id: "3",
-    column: "backlog",
-  },
-  {
-    title: "Document Notifications service",
-    id: "4",
-    column: "backlog",
-  },
-
-  {
-    title: "Research DB options",
-    id: "5",
-    column: "todo",
-  },
-  {
-    title: "Postmortem for outage",
-    id: "6",
-    column: "todo",
-  },
-  {
-    title: "Sync with product team",
-    id: "7",
-    column: "todo",
-  },
-
-  {
-    title: "Refactor context providers",
-    id: "8",
-    column: "doing",
-  },
-  {
-    title: "Add logging to CRON",
-    id: "9",
-    column: "doing",
-  },
-
-  {
-    title: "Set up monitoring dashboards",
-    id: "10",
-    column: "done",
-  },
-];
-
 const Kanban = () => {
   const [title, setTitle] = useState("");
-  const [cards, setCards] = useState(DEFAULT_CARDS);
+  const [cards, setCards] = useState<CardType[]>([]);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-
+  const { id } = useParams();
   const { isTemplatesModalOpen } = useTemplatesModal();
+
+  useEffect(() => {
+    if (!id) return;
+
+    const loadPage = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/pages/${id}`);
+
+        const page = await res.json();
+
+        setTitle(page.title);
+        setCards(page.content?.cards || []);
+      }
+      catch (error) {
+        console.error("Failed to load page:", error);
+      }
+    };
+    loadPage();
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const timeout = setTimeout(async () => {
+      try {
+        await fetch(
+          `http://localhost:5000/api/pages/${id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify({
+              title,
+              content: {
+                cards,
+              },
+            }),
+          }
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [title, cards, id]);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -105,13 +90,10 @@ const Kanban = () => {
     <div
       className={`
         w-full min-h-screen transition-all duration-200
-        ${
-          isTemplatesModalOpen
-            ? "blur-sm pointer-events-none"
-            : ""
-        }
-      `}
-    >
+        ${isTemplatesModalOpen
+          ? "blur-sm pointer-events-none"
+          : ""
+        }`}>
       <PageToolbar
         title={title}
         isOnline={isOnline}
@@ -199,9 +181,7 @@ const Column = ({
 
   const getIndicators = () => {
     return Array.from(
-      document.querySelectorAll(
-        `[data-column="${column}"]`
-      )
+      document.querySelectorAll(`[data-column="${column}"]`)
     ) as HTMLElement[];
   };
 
@@ -225,9 +205,7 @@ const Column = ({
       (closest, child) => {
         const box = child.getBoundingClientRect();
 
-        const offset =
-          e.clientY -
-          (box.top + DISTANCE_OFFSET);
+        const offset = e.clientY - (box.top + DISTANCE_OFFSET);
 
         if (
           offset < 0 &&
@@ -278,27 +256,19 @@ const Column = ({
     setActive(false);
   };
 
-  const handleDrop = (
-    e: DragEvent
-  ) => {
+  const handleDrop = (e: DragEvent) => {
     e.preventDefault();
 
-    const cardId =
-      e.dataTransfer.getData("cardId");
+    const cardId = e.dataTransfer.getData("cardId");
 
     clearHighlights();
     setActive(false);
 
     const indicators = getIndicators();
 
-    const { element } =
-      getNearestIndicator(
-        e,
-        indicators
-      );
+    const { element } = getNearestIndicator( e, indicators );
 
-    const before =
-      element.dataset.before || "-1";
+    const before = element.dataset.before || "-1";
 
     if (before === cardId) return;
 
@@ -310,10 +280,7 @@ const Column = ({
 
     if (!card) return;
 
-    card = {
-      ...card,
-      column,
-    };
+    card = { ...card, column };
 
     copy = copy.filter(
       (c) => c.id !== cardId
@@ -356,13 +323,10 @@ const Column = ({
           bg-white
           p-3
           transition-all
-          ${
-            active
-              ? "border-violet-400 bg-violet-50"
-              : ""
-          }
-        `}
-      >
+          ${active
+            ? "border-violet-400 bg-violet-50"
+            : ""
+          }`}>
         {filteredCards.map((card) => (
           <Card
             key={card.id}
@@ -394,12 +358,7 @@ type CardProps = CardType & {
   ) => void;
 };
 
-const Card = ({
-  title,
-  id,
-  column,
-  handleDragStart,
-}: CardProps) => {
+const Card = ({ title, id, column, handleDragStart }: CardProps) => {
   return (
     <>
       <DropIndicator
@@ -411,7 +370,7 @@ const Card = ({
         layout
         layoutId={id}
         draggable
-        onDragStart={(e : any) =>
+        onDragStart={(e: any) =>
           handleDragStart(e, {
             title,
             id,
@@ -428,9 +387,7 @@ const Card = ({
           p-4
           shadow-sm
           hover:shadow-md
-          active:cursor-grabbing
-        "
-      >
+          active:cursor-grabbing">
         <p className="text-sm text-neutral-700">
           {title}
         </p>
@@ -439,10 +396,7 @@ const Card = ({
   );
 };
 
-const DropIndicator = ({
-  beforeId,
-  column,
-}: {
+const DropIndicator = ({ beforeId, column }: {
   beforeId: string | null;
   column: string;
 }) => {
@@ -450,30 +404,17 @@ const DropIndicator = ({
     <div
       data-before={beforeId || "-1"}
       data-column={column}
-      className="
-        my-1
-        h-0.5
-        w-full
-        bg-[#7c69ff]
-        opacity-0
-      "
+      className="my-1 h-0.5 w-full bg-[#7c69ff] opacity-0"
     />
   );
 };
 
-const DeleteZone = ({
-  setCards,
-}: {
-  setCards: Dispatch<
-    SetStateAction<CardType[]>
-  >;
+const DeleteZone = ({ setCards }: {
+  setCards: Dispatch<SetStateAction<CardType[]>>;
 }) => {
-  const [active, setActive] =
-    useState(false);
+  const [active, setActive] = useState(false);
 
-  const handleDragOver = (
-    e: DragEvent
-  ) => {
+  const handleDragOver = (e: DragEvent) => {
     e.preventDefault();
     setActive(true);
   };
@@ -482,9 +423,7 @@ const DeleteZone = ({
     setActive(false);
   };
 
-  const handleDrop = (
-    e: DragEvent
-  ) => {
+  const handleDrop = (e: DragEvent) => {
     const cardId =
       e.dataTransfer.getData("cardId");
 
@@ -513,13 +452,10 @@ const DeleteZone = ({
         border-2
         border-dashed
         transition-all
-        ${
-          active
-            ? "border-red-400 bg-red-50 text-red-500"
-            : "border-neutral-300 text-neutral-400"
-        }
-      `}
-    >
+        ${active
+          ? "border-red-400 bg-red-50 text-red-500"
+          : "border-neutral-300 text-neutral-400"
+        }`}>
       <div className="flex items-center gap-2">
         <FiTrash />
         Drag & Drop to Delete
@@ -538,12 +474,9 @@ const AddCard = ({
   >;
 }) => {
   const [text, setText] = useState("");
-  const [adding, setAdding] =
-    useState(false);
+  const [adding, setAdding] = useState(false);
 
-  const handleSubmit = (
-    e: FormEvent
-  ) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     if (!text.trim()) return;
@@ -564,8 +497,7 @@ const AddCard = ({
   return adding ? (
     <motion.form
       layout
-      onSubmit={handleSubmit}
-    >
+      onSubmit={handleSubmit}>
       <textarea
         value={text}
         onChange={(e) =>
@@ -581,8 +513,7 @@ const AddCard = ({
           bg-violet-50
           p-3
           text-sm
-          outline-none
-        "
+          outline-none"
       />
 
       <div className="mt-2 flex justify-end gap-2">
@@ -591,22 +522,13 @@ const AddCard = ({
           onClick={() =>
             setAdding(false)
           }
-          className="text-sm text-neutral-500"
-        >
+          className="text-sm text-neutral-500">
           Cancel
         </button>
 
         <button
           type="submit"
-          className="
-            rounded-lg
-            bg-[#7c69ff]
-            px-3
-            py-2
-            text-sm
-            text-white
-          "
-        >
+          className="rounded-lg bg-[#7c69ff] px-3 py-2 text-sm text-white">
           Add
         </button>
       </div>
@@ -617,21 +539,7 @@ const AddCard = ({
       onClick={() =>
         setAdding(true)
       }
-      className="
-        mt-2
-        flex
-        w-full
-        items-center
-        gap-2
-        rounded-lg
-        px-3
-        py-2
-        text-sm
-        text-neutral-500
-        hover:bg-neutral-100
-        hover:text-neutral-900
-      "
-    >
+      className="mt-2 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900">
       <FiPlus />
       Add card
     </motion.button>

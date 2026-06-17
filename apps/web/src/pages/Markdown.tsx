@@ -13,12 +13,9 @@ const Markdown = () => {
   const { id } = useParams();
 
   const [title, setTitle] = useState("");
-  const [isOnline, setIsOnline] = useState(
-    navigator.onLine
-  );
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-  const { isTemplatesModalOpen } =
-    useTemplatesModal();
+  const { isTemplatesModalOpen } = useTemplatesModal();
 
   const editor = useEditor({
     extensions: [
