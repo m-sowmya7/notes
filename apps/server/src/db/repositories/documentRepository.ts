@@ -38,4 +38,18 @@ export const PageRepository = {
             data,
         });
     },
+
+    delete(id: string) {
+        return prisma.page.delete({ where: { id } });
+    },
+
+    async toggleStar(id: string) {
+        const page = await prisma.page.findUnique({ where: { id } });
+        return prisma.page.update({
+            where: { id },
+            data: {
+                starred: !page?.starred
+            }
+        })
+    }
 };

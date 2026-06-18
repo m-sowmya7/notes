@@ -1,12 +1,12 @@
 // Tasks : 
-// 1. conformation for delete action
-// 2. online/offline status with websocket connection and make sure sync action is showing
+// 1. online/offline status with websocket connection and make sure sync action is showing
 import { ArrowLeft, Star, Share2, MoreHorizontal, Trash2, Loader2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import ShareModal from "./ShareModal";
 
 type PageToolbarProps = {
+  pageId: string;
   title: string;
   isOnline: boolean;
   isSyncing: boolean;
@@ -14,16 +14,43 @@ type PageToolbarProps = {
 };
 
 const PageToolbar = ({
+  pageId,
   title,
   isOnline,
   isSyncing,
   isModalOpen,
 }: PageToolbarProps) => {
   const navigate = useNavigate();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [open, setOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+
+      const res = await fetch(`http://localhost:5000/api/pages/${pageId}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (!res.ok) {
+        throw new Error("Failed to delete page");
+      }
+      navigate('/pages');
+    }
+    catch (error) {
+      console.log(error);
+      alert("Failed to delete page. Please try again.");
+    }
+    finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+    }
+  }
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -102,8 +129,8 @@ const PageToolbar = ({
           <Star
             size={18}
             className={`transition-colors ${isFavorite
-                ? "fill-yellow-400 text-yellow-400"
-                : "text-black"
+              ? "fill-yellow-400 text-yellow-400"
+              : "text-black"
               }`}
           />
         </button>
@@ -126,6 +153,9 @@ const PageToolbar = ({
                 shadow-lg
                 py-1">
               <button
+                onClick={() => {
+                  setShowDeleteModal(true)
+                }}
                 className="
                   w-full
                   flex items-center gap-2
@@ -144,6 +174,53 @@ const PageToolbar = ({
         onClose={() => setShareOpen(false)}
         title={title}
       />
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-100 m-75 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-md rounded-xl bg-red-50 p-6 shadow-xl">
+            <h2 className="text-lg font-semibold text-neutral-900">
+              Delete Page
+            </h2>
+
+            <p className="mt-2 text-sm text-black">
+              Bestie, are you absolutely sure you wanna delete{" "}
+              <span className="font-medium">{title}</span>?
+            </p>
+
+            <p className="mt-1 text-sm text-black">
+              This action cannot be ctrl+z'd.
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
+                className="rounded-md border px-4 py-2 hover:bg-neutral-50"
+              >
+                Nah
+              </button>
+
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="
+            flex items-center gap-2
+            rounded-md
+            bg-red-500
+            px-4 py-2
+            text-white
+            hover:bg-red-600
+            disabled:opacity-50
+          "
+              >
+                {isDeleting && (
+                  <Loader2 size={16} className="animate-spin" />
+                )}
+                Yes, Got for it.
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

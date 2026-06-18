@@ -47,3 +47,32 @@ export const updatePage = async (req: Request, res: Response) => {
         res.status(500).json(error);
     }
 }
+
+export const deletePage = async (req: Request, res: Response) => {
+    try {
+        await PageService.deletePage(String(req.params.id));
+        res.status(204).send();
+    }
+    catch(error) {
+        res.status(500).json(error);
+    }
+}
+
+export const toggleStar = async (req: Request, res: Response) => {
+  try {
+    const page = await PageService.toggleStar(String(req.params.id));
+    res.json(page);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+export const getStarredPages = async (req: Request, res: Response) => {
+    try {
+        const pages = await PageService.getStarredPages();
+        res.json(pages);
+    }
+    catch(error) {
+        res.status(500).json(error);
+    }
+} 

@@ -1,25 +1,31 @@
+// Tasks : 
+// 1. redirection of pages to actual editors
+// 2. still getting that 500 error but the pages are being displayed
+// 3. should be able to removethe pages from starred from here
+// 4. the pages properties should be there like type of the page and the icon color as they are like in the dashboard
 import { MoreHorizontal, Search, Star } from 'lucide-react'
+import { useState, useEffect } from 'react';
+// const starredPages = [
+//   {
+//     title: 'Project Planning Board',
+//     edited: 'Edited 2 mins ago',
+//     color: '#a8c48b',
+//     starred: true,
+//   },
+//   {
+//     title: 'Website Redesign',
+//     edited: 'Edited 1 day ago',
+//     color: '#d7a2dc',
+//     starred: true,
+//   },
+//   {
+//     title: 'Brand Guidelines',
+//     edited: 'Edited 5 days ago',
+//     color: '#8fc2ef',
+//     starred: true,
+//   },
+// ]
 
-const starredPages = [
-  {
-    title: 'Project Planning Board',
-    edited: 'Edited 2 mins ago',
-    color: '#a8c48b',
-    starred: true,
-  },
-  {
-    title: 'Website Redesign',
-    edited: 'Edited 1 day ago',
-    color: '#d7a2dc',
-    starred: true,
-  },
-  {
-    title: 'Brand Guidelines',
-    edited: 'Edited 5 days ago',
-    color: '#8fc2ef',
-    starred: true,
-  },
-]
 
 const FolderIcon = ({ color }: { color: string }) => {
   return (
@@ -46,6 +52,22 @@ const FolderIcon = ({ color }: { color: string }) => {
 }
 
 const StarredPage = () => {
+  const [starredPages, setStarredPages] = useState<any[]>([]);
+  useEffect(() => {
+    try {
+      const loadStarredPages = async () => {
+        const res = await fetch("http://localhost:5000/api/pages/starred");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        setStarredPages(data);
+      }
+
+      loadStarredPages();
+    }
+    catch(error) {
+      throw new Error("Failed to load starred pages");
+    }
+}, [])
   return (
     <main className="flex min-h-screen bg-[#f6f3ef]">
       <section className="flex-1 px-12 py-10">
@@ -81,10 +103,9 @@ const StarredPage = () => {
                 flex w-full items-center justify-between
                 px-6 py-5 text-left transition
                 hover:bg-neutral-50
-                ${
-                  index !== starredPages.length - 1
-                    ? 'border-b border-neutral-100'
-                    : ''
+                ${index !== starredPages.length - 1
+                  ? 'border-b border-neutral-100'
+                  : ''
                 }`}>
               <div className="flex items-center gap-5">
                 <FolderIcon color={page.color} />

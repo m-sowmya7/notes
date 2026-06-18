@@ -22,7 +22,7 @@ const Markdown = () => {
       StarterKit,
       Placeholder.configure({
         placeholder:
-          "Type '/' for commands...",
+          "Start Yapping and hit '/' for commands...",
       }),
       SlashCommand,
     ],
@@ -140,6 +140,7 @@ const Markdown = () => {
       className={`w-full min-h-screen transition-all ${isTemplatesModalOpen ? "blur-sm" : ""}`}>
 
       <PageToolbar
+        pageId={id || ""}
         title={title}
         isOnline={isOnline}
         isSyncing={false}

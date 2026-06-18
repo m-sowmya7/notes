@@ -117,7 +117,7 @@ const templates = [
 const TemplatesModal = ({ open, onClose }: TemplatesModalProps) => {
   const navigate = useNavigate();
 
-  const createPage = async ( type: string, path: string ) => {
+  const createPage = async (title: string, type: string, path: string) => {
     try {
       let content: any = {};
 
@@ -162,7 +162,7 @@ const TemplatesModal = ({ open, onClose }: TemplatesModalProps) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            title: "",
+            title,
             type,
             content,
           }),
@@ -216,6 +216,7 @@ const TemplatesModal = ({ open, onClose }: TemplatesModalProps) => {
               key={template.id}
               onClick={() =>
                 createPage(
+                  template.title,
                   template.type,
                   template.path
                 )

@@ -16,5 +16,17 @@ export const PageService = {
 
     async updatePage(id: string, title: string, content: any) {
         return PageRepository.update(id, { title, content });
+    },
+
+    async deletePage(id: string) {
+        return PageRepository.delete(id);
+    },
+
+    async toggleStar(id: string) {
+        return PageRepository.toggleStar(id);
+    },
+
+    async getStarredPages() {
+        return PageRepository.findAll().then(pages => pages.filter(page => page.starred));
     }
 };

@@ -95,6 +95,7 @@ const Kanban = () => {
           : ""
         }`}>
       <PageToolbar
+        pageId={id || ""}
         title={title}
         isOnline={isOnline}
         isSyncing={false}
