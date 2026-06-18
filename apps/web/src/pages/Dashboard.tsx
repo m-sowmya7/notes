@@ -1,5 +1,5 @@
 // Tasks : 
-// 1. starred pages should go to starred page
+// 1. share option in the options has to work
 // 2. what the hell am i supposed to put in the option for a page (probably share and favourites)
 import { MoreHorizontal, Search, ChevronDown, Star } from "lucide-react";
 import { useState, useEffect } from "react";
