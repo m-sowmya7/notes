@@ -8,6 +8,7 @@ import ShareModal from "./ShareModal";
 type PageToolbarProps = {
   pageId: string;
   title: string;
+  starred: boolean;
   isOnline: boolean;
   isSyncing: boolean;
   isModalOpen?: boolean;
@@ -16,6 +17,7 @@ type PageToolbarProps = {
 const PageToolbar = ({
   pageId,
   title,
+  starred,
   isOnline,
   isSyncing,
   isModalOpen,
@@ -25,8 +27,32 @@ const PageToolbar = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [open, setOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [isStarred, setIsStarred] = useState(starred);
+
+  useEffect(() => {
+    setIsStarred(starred);
+  }, [starred]);
+
+  const handleToggleStar = async () => {
+    try {
+      setIsStarred((prev) => !prev);
+
+      const res = await fetch(
+        `http://localhost:5000/api/pages/${pageId}/star`,
+        {
+          method: "PATCH",
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error();
+      }
+    } catch (error) {
+      setIsStarred((prev) => !prev);
+      console.error(error);
+    }
+  };
 
   const handleDelete = async () => {
     try {
@@ -75,12 +101,7 @@ const PageToolbar = ({
     px-6 py-3
     border-b border-neutral-200
     transition-all
-    ${isModalOpen
-          ? "bg-white/40 backdrop-blur-md"
-          : "bg-white/90 backdrop-blur"
-        }
-  `}
-    >
+    ${isModalOpen ? "bg-white/40 backdrop-blur-md" : "bg-white/90 backdrop-blur"}`}>
       {/* Left */}
       <div className="flex items-center gap-2">
         <button
@@ -101,16 +122,8 @@ const PageToolbar = ({
             </div>
           ) : (
             <div
-              className={`flex items-center gap-1 text-sm ${isOnline
-                ? "text-green-600"
-                : "text-neutral-500"
-                }`}>
-              <div
-                className={`h-2 w-2 rounded-full ${isOnline
-                  ? "bg-green-500"
-                  : "bg-neutral-400"
-                  }`}
-              />
+              className={`flex items-center gap-1 text-sm ${isOnline ? "text-green-600" : "text-neutral-500"}`}>
+              <div className={`h-2 w-2 rounded-full ${isOnline ? "bg-green-500" : "bg-neutral-400"}`}/>
               {isOnline ? "Online" : "Offline"}
             </div>
           )}
@@ -124,14 +137,11 @@ const PageToolbar = ({
         </button>
 
         <button
-          onClick={() => setIsFavorite((prev) => !prev)}
+          onClick={handleToggleStar}
           className="p-2 rounded-md hover:bg-neutral-100">
           <Star
             size={18}
-            className={`transition-colors ${isFavorite
-              ? "fill-yellow-400 text-yellow-400"
-              : "text-black"
-              }`}
+            className={`transition-all duration-200 ${isStarred ? "fill-yellow-400 text-yellow-400" : "text-black"}`}
           />
         </button>
 
@@ -144,14 +154,7 @@ const PageToolbar = ({
 
           {open && (
             <div
-              className="
-                absolute right-0 top-11
-                w-52
-                bg-white
-                border border-neutral-200
-                rounded-xl
-                shadow-lg
-                py-1">
+              className="absolute right-0 top-11 w-52 bg-white border border-neutral-200 rounded-xl shadow-lg py-1">
               <button
                 onClick={() => {
                   setShowDeleteModal(true)
@@ -194,8 +197,7 @@ const PageToolbar = ({
               <button
                 onClick={() => setShowDeleteModal(false)}
                 disabled={isDeleting}
-                className="rounded-md border px-4 py-2 hover:bg-neutral-50"
-              >
+                className="rounded-md border px-4 py-2 hover:bg-neutral-50">
                 Nah
               </button>
 
@@ -209,9 +211,7 @@ const PageToolbar = ({
             px-4 py-2
             text-white
             hover:bg-red-600
-            disabled:opacity-50
-          "
-              >
+            disabled:opacity-50">
                 {isDeleting && (
                   <Loader2 size={16} className="animate-spin" />
                 )}

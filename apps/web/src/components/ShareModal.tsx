@@ -19,21 +19,21 @@ const options = [
   {
     id: "view",
     title: "View Only",
-    description: "View the page",
+    description: "Can peek, can't tweak",
     icon: Eye,
     bgColor: "bg-pink-100",
   },
-  {
-    id: "comment",
-    title: "Comment Only",
-    description: "View and add comments",
-    icon: MessageSquare,
-    bgColor: "bg-blue-100",
-  },
+  // {
+  //   id: "comment",
+  //   title: "Comment Only",
+  //   description: "View and add comments",
+  //   icon: MessageSquare,
+  //   bgColor: "bg-blue-100",
+  // },
   {
     id: "edit",
     title: "Edit Access",
-    description: "View, comment and edit",
+    description: "Cook freely",
     icon: Pencil,
     bgColor: "bg-purple-100",
   },
@@ -44,7 +44,7 @@ const ShareModal = ({
   onClose,
   title,
 }: ShareModalProps) => {
-  const [access, setAccess] = useState<AccessLevel>("edit");
+  const [access, setAccess] = useState<AccessLevel>("view");
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -72,7 +72,7 @@ const ShareModal = ({
         {/* Header */}
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-lg font-semibold">
-            Share "{title || "Untitled"}"
+            Spread the tea from "{title || "Untitled"}"
           </h2>
 
           <button
@@ -82,18 +82,13 @@ const ShareModal = ({
           </button>
         </div>
 
-        {/* Access */}
-        <h3 className="mb-3 text-sm font-medium">Access</h3>
-
         <div className="space-y-3">
           {options.map(({ id, title, description, icon: Icon, bgColor }) => (
             <button
               key={id}
               onClick={() => setAccess(id as AccessLevel)}
               className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 transition ${
-                access === id
-                  ? "border-violet-400 bg-violet-50"
-                  : "border-neutral-200"
+                access === id ? "border-violet-400 bg-violet-50" : "border-neutral-200"
               }`}>
               <div className="flex items-center gap-3">
                 <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${bgColor}`}>
@@ -119,7 +114,7 @@ const ShareModal = ({
 
         {/* Share Link */}
         <div className="mt-6">
-          <p className="mb-2 text-sm font-medium">Share Link</p>
+          <p className="mb-2 text-sm font-medium">Share The Vibe</p>
 
           <div className="flex gap-2">
             <input

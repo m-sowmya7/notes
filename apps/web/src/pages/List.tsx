@@ -15,6 +15,7 @@ const List = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const { isTemplatesModalOpen } = useTemplatesModal();
   const [title, setTitle] = useState("");
+  const [starred, setStarred] = useState(false);
   const { id } = useParams();
   const [items, setItems] = useState<ListItem[]>([
     {
@@ -33,6 +34,7 @@ const List = () => {
       const page = await res.json();
       
       setTitle(page.title);
+      setStarred(page.starred);
       setItems(page.content.items || []);
     };
     loadPage();
@@ -143,6 +145,7 @@ const List = () => {
       <PageToolbar
         pageId={id || ""}
         title={title}
+        starred={starred}
         isOnline={isOnline}
         isSyncing={false}
         isModalOpen={isTemplatesModalOpen}

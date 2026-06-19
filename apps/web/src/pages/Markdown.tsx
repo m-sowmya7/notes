@@ -13,6 +13,7 @@ const Markdown = () => {
   const { id } = useParams();
 
   const [title, setTitle] = useState("");
+  const [starred, setStarred] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   const { isTemplatesModalOpen } = useTemplatesModal();
@@ -43,7 +44,8 @@ const Markdown = () => {
       const page = await res.json();
 
       setTitle(page.title);
-
+      setStarred(page.starred);
+      
       editor.commands.setContent(page.content || {});
     };
 
@@ -142,6 +144,7 @@ const Markdown = () => {
       <PageToolbar
         pageId={id || ""}
         title={title}
+        starred={starred}
         isOnline={isOnline}
         isSyncing={false}
         isModalOpen={isTemplatesModalOpen}

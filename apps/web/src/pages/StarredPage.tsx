@@ -1,10 +1,4 @@
-import {
-  MoreHorizontal,
-  Search,
-  Star,
-  Share2,
-  FolderOpen,
-} from "lucide-react";
+import { MoreHorizontal, Search, Star, Share2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -77,9 +71,7 @@ const StarredPage = () => {
 
   const [starredPages, setStarredPages] = useState<Page[]>([]);
   const [search, setSearch] = useState("");
-  const [activeMenu, setActiveMenu] = useState<string | null>(
-    null
-  );
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
   useEffect(() => {
     const loadStarredPages = async () => {
@@ -121,9 +113,7 @@ const StarredPage = () => {
     };
   }, []);
 
-  const toggleFavorite = async (
-    pageId: string
-  ) => {
+  const toggleFavorite = async ( pageId: string ) => {
     try {
       setStarredPages((prev) =>
         prev.filter(
@@ -143,10 +133,7 @@ const StarredPage = () => {
   };
 
   const filteredPages = starredPages.filter(
-    (page) =>
-      page.title
-        .toLowerCase()
-        .includes(search.toLowerCase())
+    (page) => page.title.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -162,31 +149,20 @@ const StarredPage = () => {
         {/* Search */}
         <div className="mt-8 flex items-center justify-between">
           <div className="flex w-85 items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3">
-            <Search
-              size={18}
-              className="text-neutral-400"
-            />
+            <Search size={18} className="text-neutral-400"/>
 
             <input
               type="text"
               value={search}
-              onChange={(e) =>
-                setSearch(e.target.value)
-              }
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Search starred pages..."
-              className="
-                w-full
-                bg-transparent
-                text-sm
-                outline-none
-                placeholder:text-neutral-400
-              "
+              className="w-full bg-transparent text-sm outline-none placeholder:text-neutral-400"
             />
           </div>
         </div>
 
         {/* List */}
-        <div className="mt-8 overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+        <div className="mt-8 rounded-2xl border border-neutral-200 bg-white">
           {filteredPages.length === 0 ? (
             <div className="p-8 text-center text-neutral-500">
               No starred pages found
@@ -196,23 +172,10 @@ const StarredPage = () => {
               (page, index) => (
                 <button
                   key={page.id}
-                  onClick={() =>
-                    navigate(
-                      `/editor/${page.type}/${page.id}`
-                    )
+                  onClick={() => navigate(`/editor/${page.type}/${page.id}`)
                   }
-                  className={`
-                    flex w-full items-center justify-between
-                    px-6 py-5 text-left transition
-                    hover:bg-neutral-50
-                    ${
-                      index !==
-                      filteredPages.length - 1
-                        ? "border-b border-neutral-100"
-                        : ""
-                    }
-                  `}
-                >
+                  className={`flex w-full items-center justify-between px-6 py-5 text-left transition hover:bg-neutral-50
+                    ${index !== filteredPages.length - 1 ? "border-b border-neutral-100" : ""}`}>
                   {/* Left */}
                   <div className="flex items-center gap-5">
                     <FolderIcon
@@ -237,13 +200,7 @@ const StarredPage = () => {
                   {/* Right */}
                   <div className="relative">
                     <div className="flex items-center gap-3">
-                      <Star
-                        size={16}
-                        className="
-                          fill-yellow-400
-                          text-yellow-400
-                        "
-                      />
+                      <Star size={16} className="fill-yellow-400 text-yellow-400"/>
 
                       <button
                         onClick={(e) => {
@@ -254,8 +211,7 @@ const StarredPage = () => {
                               ? null
                               : page.id
                           );
-                        }}
-                      >
+                        }}>
                         <MoreHorizontal
                           size={20}
                           className="text-neutral-500"
@@ -268,80 +224,26 @@ const StarredPage = () => {
                         onClick={(e) =>
                           e.stopPropagation()
                         }
-                        className="
-                          absolute
-                          right-0
-                          top-8
-                          z-50
-                          w-52
-                          rounded-xl
-                          border
-                          border-neutral-200
-                          bg-white
-                          shadow-lg
-                        "
-                      >
-                        <button
-                          onClick={() => {
-                            navigate(
-                              `/editor/${page.type}/${page.id}`
-                            );
-
-                            setActiveMenu(
-                              null
-                            );
-                          }}
-                          className="
-                            flex w-full items-center gap-2
-                            px-4 py-3 text-sm
-                            hover:bg-neutral-50
-                          "
-                        >
-                          <FolderOpen
-                            size={16}
-                          />
-                          Open
-                        </button>
+                        className="absolute right-0 top-8 z-50 w-52 rounded-xl border border-neutral-200 bg-white shadow-lg">
 
                         <button
                           onClick={() => {
-                            setActiveMenu(
-                              null
-                            );
-
+                            setActiveMenu(null);
                             // open share modal here
                           }}
-                          className="
-                            flex w-full items-center gap-2
-                            px-4 py-3 text-sm
-                            hover:bg-neutral-50
-                          "
-                        >
+                          className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50">
                           <Share2 size={16} />
                           Share
                         </button>
 
                         <button
                           onClick={() => {
-                            toggleFavorite(
-                              page.id
-                            );
-
-                            setActiveMenu(
-                              null
-                            );
+                            toggleFavorite(page.id);
+                            setActiveMenu(null);
                           }}
-                          className="
-                            flex w-full items-center gap-2
-                            px-4 py-3 text-sm
-                            text-yellow-600
-                            hover:bg-neutral-50
-                          "
-                        >
-                          <Star
-                            size={16}
-                          />
-                          Remove Favorite
+                          className="flex w-full items-center gap-2 px-4 py-3 text-sm text-yellow-600 hover:bg-neutral-50">
+                          <Star size={16}/>
+                          UnFavorite
                         </button>
                       </div>
                     )}

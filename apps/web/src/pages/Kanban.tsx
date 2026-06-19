@@ -20,6 +20,7 @@ type CardType = {
 
 const Kanban = () => {
   const [title, setTitle] = useState("");
+  const [starred, setStarred] = useState(false);
   const [cards, setCards] = useState<CardType[]>([]);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const { id } = useParams();
@@ -35,6 +36,7 @@ const Kanban = () => {
         const page = await res.json();
 
         setTitle(page.title);
+        setStarred(page.starred);
         setCards(page.content?.cards || []);
       }
       catch (error) {
@@ -97,6 +99,7 @@ const Kanban = () => {
       <PageToolbar
         pageId={id || ""}
         title={title}
+        starred={starred}
         isOnline={isOnline}
         isSyncing={false}
         isModalOpen={isTemplatesModalOpen}

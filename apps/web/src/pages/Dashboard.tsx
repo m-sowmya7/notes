@@ -1,7 +1,7 @@
 // Tasks : 
 // 1. share option in the options has to work
 // 2. what the hell am i supposed to put in the option for a page (probably share and favourites)
-import { MoreHorizontal, Search, ChevronDown, Star } from "lucide-react";
+import { MoreHorizontal, Search, ChevronDown, Star, Share2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { type Page } from "../../types/pageType";
@@ -177,10 +177,7 @@ const DashboardPage = () => {
                         setSortBy(key);
                         setShowSortMenu(false);
                       }}
-                      className={`flex w-full items-center px-4 py-3 text-sm hover:bg-neutral-50 ${
-                        sortBy === key ? "font-semibold" : ""
-                      }`}
-                    >
+                      className={`flex w-full items-center px-4 py-3 text-sm hover:bg-neutral-50 ${sortBy === key ? "font-semibold" : ""}`}>
                       {label}
                     </button>
                   )
@@ -190,7 +187,7 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        <div className="mt-8 overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+        <div className="mt-8 rounded-2xl border border-neutral-200 bg-white">
           {sortedPages.length === 0 ? (
             <p className="px-6 py-10 text-center text-sm text-neutral-400">
               No pages found.
@@ -200,12 +197,8 @@ const DashboardPage = () => {
               <div
                 key={page.id}
                 onClick={() => navigate(`/editor/${page.type}/${page.id}`)}
-                className={`flex w-full cursor-pointer items-center justify-between px-6 py-5 transition hover:bg-neutral-50 ${
-                  index !== sortedPages.length - 1
-                    ? "border-b border-neutral-100"
-                    : ""
-                }`}
-              >
+                className={`flex w-full cursor-pointer items-center justify-between px-6 py-5 transition hover:bg-neutral-50 ${index !== sortedPages.length - 1
+                    ? "border-b border-neutral-100" : ""}`}>
                 <div className="flex items-center gap-5">
                   <FolderIcon color={getFolderColor(page.type)} />
                   <div>
@@ -216,44 +209,50 @@ const DashboardPage = () => {
                   </div>
                 </div>
 
-                <div
-                  className="relative flex items-center gap-3"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {page.starred && (
-                    <Star
-                      size={16}
-                      className="fill-yellow-400 text-yellow-400"
-                    />
-                  )}
+                <div className="relative">
+                  <div className="flex items-center gap-3">
+                    {page.starred && <Star size={16} className="fill-yellow-400 text-yellow-400" />}
 
-                  <button
-                    onClick={() =>
-                      setActiveMenu(activeMenu === page.id ? null : page.id)
-                    }
-                    className="rounded p-1 hover:bg-neutral-100"
-                  >
-                    <MoreHorizontal size={20} className="text-neutral-500" />
-                  </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+
+                        setActiveMenu(
+                          activeMenu === page.id ? null : page.id
+                        );
+                      }}>
+                      <MoreHorizontal
+                        size={20}
+                        className="text-neutral-500"
+                      />
+                    </button>
+                  </div>
 
                   {activeMenu === page.id && (
-                    <div className="absolute right-0 top-8 z-50 w-48 rounded-xl border border-neutral-200 bg-white shadow-lg">
+                    <div
+                      onClick={(e) =>
+                        e.stopPropagation()
+                      }
+                      className="absolute right-0 top-8 z-50 w-52 rounded-xl border border-neutral-200 bg-white shadow-lg">
+
+                      <button
+                        onClick={() => {
+                          setActiveMenu(null);
+                          // open share modal here
+                        }}
+                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50">
+                        <Share2 size={16} />
+                        Share
+                      </button>
+
                       <button
                         onClick={() => {
                           toggleFavorite(page.id);
                           setActiveMenu(null);
                         }}
-                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50"
-                      >
-                        {page.starred ? "Remove Favorite" : "Add to Favorites"}
-                      </button>
-                      <button
-                        onClick={() => {
-                          // open share modal
-                        }}
-                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50"
-                      >
-                        Share
+                        className="flex w-full items-center gap-2 px-4 py-3 text-sm text-yellow-600 hover:bg-neutral-50">
+                        <Star size={16} />
+                        UnFavorite
                       </button>
                     </div>
                   )}
