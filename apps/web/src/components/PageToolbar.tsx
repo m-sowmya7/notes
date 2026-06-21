@@ -38,10 +38,17 @@ const PageToolbar = ({
     try {
       setIsStarred((prev) => !prev);
 
+      const user = localStorage.getItem("userId");
+      if (!user) {
+        throw new Error("User not found");
+      }
       const res = await fetch(
         `http://localhost:5000/api/pages/${pageId}/star`,
         {
           method: "PATCH",
+          headers: {
+            "x-user-id": user || "",
+          }
         }
       );
 
@@ -57,10 +64,12 @@ const PageToolbar = ({
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-
       const res = await fetch(`http://localhost:5000/api/pages/${pageId}`,
         {
           method: "DELETE",
+          headers: {
+            "x-user-id": localStorage.getItem("userId") || "",
+          }
         }
       );
       if (!res.ok) {

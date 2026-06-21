@@ -35,11 +35,18 @@ const Markdown = () => {
     },
   });
 
+  const user = localStorage.getItem("userId");
+  
   useEffect(() => {
     if (!id || !editor) return;
 
     const loadPage = async () => {
-      const res = await fetch(`http://localhost:5000/api/pages/${id}`);
+      const res = await fetch(`http://localhost:5000/api/pages/${id}`, {
+        method: "GET",
+        headers: {
+          "x-user-id": user || "",
+        }
+      });
 
       const page = await res.json();
 
@@ -68,6 +75,7 @@ const Markdown = () => {
               method: "PUT",
               headers: {
                 "Content-Type": "application/json",
+                "x-user-id": user || "",
               },
               body: JSON.stringify({
                 title,

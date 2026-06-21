@@ -73,11 +73,16 @@ const StarredPage = () => {
   const [search, setSearch] = useState("");
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
+  const user = localStorage.getItem("userId");
   useEffect(() => {
     const loadStarredPages = async () => {
       try {
         const res = await fetch(
-          "http://localhost:5000/api/pages/starred"
+          "http://localhost:5000/api/pages/starred", {
+            headers: {
+              "x-user-id": user || "",
+            }
+          }
         );
 
         if (!res.ok) {
@@ -125,6 +130,9 @@ const StarredPage = () => {
         `http://localhost:5000/api/pages/${pageId}/star`,
         {
           method: "PATCH",
+          headers: {
+            "x-user-id": user || "",
+          }
         }
       );
     } catch (error) {

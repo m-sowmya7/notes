@@ -9,7 +9,7 @@ type TemplatesModalProps = {
 const templates = [
   {
     id: "markdown",
-    title: "Plain Text",
+    title: "",
     description: "Simple markdown document",
     type: "MARKDOWN",
     path: "/editor/markdown",
@@ -33,7 +33,7 @@ const templates = [
 
   {
     id: "list",
-    title: "List",
+    title: "",
     description: "Organize tasks and ideas",
     type: "LIST",
     path: "/editor/list",
@@ -70,7 +70,7 @@ const templates = [
 
   {
     id: "kanban",
-    title: "Kanban Board",
+    title: "",
     description: "Track workflows visually",
     type: "KANBAN",
     path: "/editor/kanban",
@@ -154,12 +154,14 @@ const TemplatesModal = ({ open, onClose }: TemplatesModalProps) => {
           content = {};
       }
 
+      const user = localStorage.getItem("userId");
       const res = await fetch(
         "http://localhost:5000/api/pages",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "x-user-id": user || ""
           },
           body: JSON.stringify({
             title,

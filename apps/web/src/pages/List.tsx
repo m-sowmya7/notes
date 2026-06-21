@@ -24,13 +24,17 @@ const List = () => {
       completed: false,
     },
   ]);
-
+  const user = localStorage.getItem("userId");
 
   useEffect(() => {
     if (!id) return;
 
     const loadPage = async () => {
-      const res = await fetch(`http://localhost:5000/api/pages/${id}`);
+      const res = await fetch(`http://localhost:5000/api/pages/${id}`, {
+        headers: {
+          "x-user-id": user || "",
+        }
+      });
       const page = await res.json();
       
       setTitle(page.title);
@@ -48,6 +52,7 @@ const List = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "x-user-id": user || "",
         },
         body: JSON.stringify({
           title,

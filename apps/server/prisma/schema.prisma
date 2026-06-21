@@ -13,13 +13,43 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+enum AccessLevel {
+  VIEW
+  // COMMENT
+  EDIT
+}
+model PageShare {
+  id       String @id @default(uuid())
 
+  pageId   String
+  userId   String
+
+  access   AccessLevel
+
+  page     Page @relation(fields: [pageId], references: [id])
+  user     User @relation(fields: [userId], references: [id])
+
+  @@unique([pageId, userId])
+}
+model User {
+  id        String   @id @default(uuid())
+  name      String?
+
+  pages      Page[]
+  shares     PageShare[]
+
+  createdAt DateTime @default(now())
+}
 model Page {
   id        String   @id @default(uuid())
   title     String
   type      PageType @default(MARKDOWN)
   starred   Boolean  @default(false)
   content   Json
+  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id])
+
+  shares    PageShare[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

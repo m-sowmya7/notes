@@ -25,13 +25,19 @@ const Kanban = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const { id } = useParams();
   const { isTemplatesModalOpen } = useTemplatesModal();
+  
+  const user = localStorage.getItem("userId");
 
   useEffect(() => {
     if (!id) return;
 
     const loadPage = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/pages/${id}`);
+        const res = await fetch(`http://localhost:5000/api/pages/${id}`, {
+          headers: {
+            "x-user-id": user || "",
+          }
+        });
 
         const page = await res.json();
 
@@ -56,8 +62,8 @@ const Kanban = () => {
           {
             method: "PUT",
             headers: {
-              "Content-Type":
-                "application/json",
+              "Content-Type": "application/json",
+              "x-user-id": user || "",
             },
             body: JSON.stringify({
               title,

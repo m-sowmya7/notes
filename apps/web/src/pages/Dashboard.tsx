@@ -69,7 +69,13 @@ const DashboardPage = () => {
   useEffect(() => {
     const fetchPages = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/pages");
+        const user = localStorage.getItem("userId");
+        if (!user) throw new Error("User not found in localStorage");
+        const res = await fetch("http://localhost:5000/api/pages", {
+          headers: {
+            "x-user-id": user || "",
+          }
+        });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         setPages(data);
@@ -93,8 +99,12 @@ const DashboardPage = () => {
     );
 
     try {
+      const user = localStorage.getItem("userId");
       await fetch(`http://localhost:5000/api/pages/${pageId}/star`, {
         method: "PATCH",
+        headers: {
+          "x-user-id": user || "",
+        }
       });
     } catch (error) {
       console.error(error);
