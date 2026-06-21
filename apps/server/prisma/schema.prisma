@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -13,45 +7,56 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-enum AccessLevel {
-  VIEW
-  // COMMENT
-  EDIT
+
+model ShareLink {
+  id         String @id @default(uuid())
+  token      String @unique
+
+  pageId     String
+  page       Page @relation(fields: [pageId], references: [id])
+
+  access     AccessLevel
+
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime?
 }
+
 model PageShare {
-  id       String @id @default(uuid())
-
-  pageId   String
-  userId   String
-
-  access   AccessLevel
-
-  page     Page @relation(fields: [pageId], references: [id])
-  user     User @relation(fields: [userId], references: [id])
+  id     String      @id @default(uuid())
+  pageId String
+  userId String
+  access AccessLevel
+  page   Page        @relation(fields: [pageId], references: [id])
+  user   User        @relation(fields: [userId], references: [id])
 
   @@unique([pageId, userId])
 }
+
 model User {
-  id        String   @id @default(uuid())
+  id        String      @id @default(uuid())
   name      String?
-
-  pages      Page[]
-  shares     PageShare[]
-
-  createdAt DateTime @default(now())
-}
-model Page {
-  id        String   @id @default(uuid())
-  title     String
-  type      PageType @default(MARKDOWN)
-  starred   Boolean  @default(false)
-  content   Json
-  ownerId   String
-  owner     User     @relation(fields: [ownerId], references: [id])
-
+  createdAt DateTime    @default(now())
+  pages     Page[]
   shares    PageShare[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+}
+
+model Page {
+  id        String      @id @default(uuid())
+  title     String
+  type      PageType    @default(MARKDOWN)
+  starred   Boolean     @default(false)
+  content   Json
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  ownerId   String
+  owner     User        @relation(fields: [ownerId], references: [id])
+  shares    PageShare[]
+  shareLinks ShareLink[]
+}
+
+enum AccessLevel {
+  VIEW
+  EDIT
 }
 
 enum PageType {

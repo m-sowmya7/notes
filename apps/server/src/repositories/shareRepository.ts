@@ -2,11 +2,7 @@ import { prisma } from "../../prisma/client";
 import { AccessLevel } from "../generated/prisma/enums";
 
 export const ShareRepository = {
-    async sharePages(
-        pageId: string,
-        userId: string,
-        access: AccessLevel
-    ) {
+    async sharePages(pageId: string, userId: string, access: AccessLevel) {
         return prisma.pageShare.upsert({
             where: {
                 pageId_userId: {
@@ -45,5 +41,49 @@ export const ShareRepository = {
                 },
             },
         });
+    }
+}
+
+export const ShareLinkRepository = {
+
+    create(pageId: string, token: string, access: AccessLevel) {
+        return prisma.shareLink.create({
+            data: {
+                pageId,
+                token,
+                access
+            }
+        })
+    },
+
+    findByToken(token: string) {
+        return prisma.shareLink.findUnique({
+            where: {
+                token
+            },
+            // why are we including page here? what does include do in prisma?
+            include: {
+                page: true
+            },
+        })
+    },
+
+    findByPage(pageId: string) {
+        return prisma.shareLink.findMany({
+            where: {
+                pageId
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        })
+    },
+
+    delete(id: string) {
+        return prisma.shareLink.delete({
+            where: {
+                id
+            }
+        })
     }
 }

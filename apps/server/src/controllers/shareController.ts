@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
-import { ShareService } from '../services/shareService';
+import { ShareService, ShareLinkService } from '../services/shareService';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const sharePage = async (req: Request, res: Response) => {
     try {
@@ -48,3 +50,64 @@ export const revokeAccess = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Failed to revoke access" });
     }
 };
+
+export const createShareLink = async (req: Request, res: Response) => {
+    try {
+        const { pageId: rawPageId } = req.params;
+        const { access } = req.body;
+        const pageId = Array.isArray(rawPageId) ? rawPageId[0] : rawPageId;
+
+        const link = await ShareLinkService.createShareLink(pageId, access);
+
+        res.status(201).json({
+            id: link.id,
+            token: link.token,
+            access: link.access,
+            expiresAt: link.expiresAt,
+            url: `${process.env.FRONTEND_URL}/share/${link.token}`,
+        });
+    }
+    catch(error) {
+        res.status(500).json({ error: "Failed to create share link" });
+    }
+}
+
+export const getSharePageByToken = async (req: Request, res: Response) => {
+    try {
+        const { token : rawToken } = req.params;
+        const token = Array.isArray(rawToken) ? rawToken[0] : rawToken;
+        const link = await ShareLinkService.getSharePageByToken(token);
+        
+        res.status(200).json({
+            page: link.page,
+            access: link.access
+        });
+    }
+    catch(error) {
+        res.status(404).json({ error: "Invalid share link"});
+    }
+}
+
+export const getPageLinks = async (req: Request, res: Response) => {
+    try {
+        const { pageId: rawPageId } = req.params;
+        const pageId = Array.isArray(rawPageId) ? rawPageId[0] : rawPageId;
+        const links = await ShareLinkService.getPageLinks(pageId);
+        res.status(200).json(links);
+    }
+    catch(error) {
+        res.status(500).json({ error: "Failed to get share links" });
+    }
+}
+
+export const deleteShareLink = async (req: Request, res: Response) => {
+    try {
+        const { id: rawId } = req.params;
+        const id = Array.isArray(rawId) ? rawId[0] : rawId;
+        await ShareLinkService.deleteShareLink(id);
+        res.status(200).json({ success: true });
+    }
+    catch(error) {
+        res.status(500).json({ error: "Failed to delete share link" });
+    }
+}

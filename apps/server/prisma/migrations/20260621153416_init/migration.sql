@@ -1,14 +1,8 @@
-/*
-  Warnings:
-
-  - Added the required column `ownerId` to the `Page` table without a default value. This is not possible if the table is not empty.
-
-*/
 -- CreateEnum
 CREATE TYPE "AccessLevel" AS ENUM ('VIEW', 'EDIT');
 
--- AlterTable
-ALTER TABLE "Page" ADD COLUMN     "ownerId" TEXT NOT NULL;
+-- CreateEnum
+CREATE TYPE "PageType" AS ENUM ('MARKDOWN', 'LIST', 'KANBAN');
 
 -- CreateTable
 CREATE TABLE "PageShare" (
@@ -27,6 +21,20 @@ CREATE TABLE "User" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Page" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "type" "PageType" NOT NULL DEFAULT 'MARKDOWN',
+    "starred" BOOLEAN NOT NULL DEFAULT false,
+    "content" JSONB NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "ownerId" TEXT NOT NULL,
+
+    CONSTRAINT "Page_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex

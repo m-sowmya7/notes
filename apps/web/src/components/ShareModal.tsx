@@ -2,8 +2,9 @@
 // 1. ofc access restrictions
 // 2. share to other apps (not necessary rn cause it makes a link)
 import { X, Copy, Eye, MessageSquare, Pencil, Check } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useParams } from "react-router-dom";
 
 type AccessLevel = "view" | "comment" | "edit";
 
@@ -13,7 +14,6 @@ type ShareModalProps = {
   title: string;
 };
 
-const shareLink = "https://notes.app/share/abc123";
 
 const options = [
   {
@@ -46,8 +46,47 @@ const ShareModal = ({
 }: ShareModalProps) => {
   const [access, setAccess] = useState<AccessLevel>("view");
   const [copied, setCopied] = useState(false);
+  const [shareLink, setShareLink] = useState("");
+  const [isGeneratingLink, setIsGeneratingLink] = useState(false);
+  const { id } = useParams();
+  const generateShareLink = async (accessLevel: AccessLevel) => {
+    if(!id) return;
+
+    try {
+      setIsGeneratingLink(true);
+
+      const res = await fetch(`http://localhost:5000/api/share-links/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          access: accessLevel === "view" ? "VIEW" : "EDIT",
+         }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to generate share link");
+      }
+
+      const data = await res.json();
+      setShareLink(data.url);
+    }
+    catch(error) {
+      console.error("Error generating share link:", error);
+    }
+    finally {
+      setIsGeneratingLink(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!open) return;
+    generateShareLink(access);
+  }, [open, access]);
 
   const handleCopy = async () => {
+    if(!shareLink) return;
     try {
       await navigator.clipboard.writeText(shareLink);
       setCopied(true);
@@ -119,7 +158,7 @@ const ShareModal = ({
           <div className="flex gap-2">
             <input
               readOnly
-              value={shareLink}
+              value={isGeneratingLink ? "Whipping up the link..." : shareLink}
               className="flex-1 rounded-xl border border-neutral-300 px-3 py-2 outline-none"
             />
 

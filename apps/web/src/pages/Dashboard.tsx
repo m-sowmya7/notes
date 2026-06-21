@@ -1,6 +1,6 @@
 // Tasks : 
 // 1. share option in the options has to work
-// 2. what the hell am i supposed to put in the option for a page (probably share and favourites)
+// 2. add all the shared links and ability to delete the shared links so that they're no longer accessible
 import { MoreHorizontal, Search, ChevronDown, Star, Share2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
