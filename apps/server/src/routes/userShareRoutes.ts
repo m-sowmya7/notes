@@ -1,10 +1,12 @@
 import { Router } from 'express';
-import { sharePage, getSharedUsers, revokeAccess } from '../controllers/shareController';
+import { createShareLink, getSharePageByToken, getPageLinks, updateSharedData, deleteShareLink } from '../controllers/shareController';
 
 const router = Router();
 
-router.post('/:pageId', sharePage);
-router.get('/:pageId/users', getSharedUsers);
-router.delete('/:pageId/users/:userId', revokeAccess);
+router.post('/:pageId', createShareLink);
+router.get('/token/:token', getSharePageByToken);
+router.put('/token/:token', updateSharedData);
+router.get('/page/:pageId', getPageLinks);
+router.delete('/:id', deleteShareLink);
 
 export default router;

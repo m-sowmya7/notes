@@ -1,7 +1,7 @@
 import express from "express"
 import cors from "cors"
 import { config } from "dotenv"
-import { PrismaClient } from "./generated/prisma/client"
+import { prisma } from "../prisma/client"
 import pageRoutes from "./routes/documentRoutes"
 import userRoutes from "./routes/userRoutes"
 import shareRoutes from "./routes/shareRoutes"
@@ -10,7 +10,6 @@ config()
 
 const PORT = process.env.PORT || 5000
 const app = express()
-const prisma = new PrismaClient()
 
 app.use(cors())
 app.use(express.json())
@@ -24,6 +23,11 @@ async function startServer() {
   try {
     await prisma.$connect()
     console.log("Database connection established")
+
+    // Keep Neon from auto-pausing (free tier pauses after 5 min inactivity)
+    setInterval(async () => {
+      try { await prisma.$queryRaw`SELECT 1` } catch {}
+    }, 4 * 60 * 1000)
 
     app.listen(PORT, () => {
       console.log(`Server running on ${PORT}`)

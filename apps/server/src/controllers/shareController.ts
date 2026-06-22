@@ -100,6 +100,23 @@ export const getPageLinks = async (req: Request, res: Response) => {
     }
 }
 
+export const updateSharedData = async (req: Request, res: Response) => {
+    try {
+        const { token: rawToken } = req.params;
+        const token = Array.isArray(rawToken) ? rawToken[0] : rawToken;
+        const { title, content } = req.body;
+        const link = await ShareLinkService.getSharePageByToken(token);
+        if (link.access !== "EDIT") {
+            return res.status(403).json({ error: "You don't have permission to edit this page" });
+        }
+        const page = await ShareLinkService.updateSharedPage(link.page.id, { title, content });
+        res.status(200).json({ page });
+    }
+    catch(error) {
+        res.status(500).json({ error: "Failed to update shared content" });
+    }
+}
+
 export const deleteShareLink = async (req: Request, res: Response) => {
     try {
         const { id: rawId } = req.params;

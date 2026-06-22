@@ -70,7 +70,7 @@ const Markdown = () => {
       timeout = setTimeout(async () => {
         try {
 
-          const res = await fetch(`http://localhost:5000/api/pages/${id}`,
+          await fetch(`http://localhost:5000/api/pages/${id}`,
             {
               method: "PUT",
               headers: {
@@ -121,8 +121,8 @@ const Markdown = () => {
           {
             method: "PUT",
             headers: {
-              "Content-Type":
-                "application/json",
+              "Content-Type": "application/json",
+              "x-user-id": user || "",
             },
             body: JSON.stringify({
               title,

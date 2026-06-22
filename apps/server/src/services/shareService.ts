@@ -1,5 +1,6 @@
 import { ShareRepository, ShareLinkRepository } from "../repositories/shareRepository";
 import { AccessLevel } from "../generated/prisma/enums";
+import { prisma } from "../../prisma/client";
 import crypto from "crypto";
 
 export const ShareService = {
@@ -44,6 +45,13 @@ export const ShareLinkService = {
 
   async getPageLinks(pageId: string) {
     return ShareLinkRepository.findByPage(pageId);
+  },
+
+  async updateSharedPage(pageId: string, data: { title?: string; content?: any }) {
+    return prisma.page.update({
+      where: { id: pageId },
+      data,
+    });
   },
 
   async deleteShareLink(id: string) {

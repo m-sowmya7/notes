@@ -1,7 +1,7 @@
 // Tasks : 
 // 1. ofc access restrictions
 // 2. share to other apps (not necessary rn cause it makes a link)
-import { X, Copy, Eye, MessageSquare, Pencil, Check } from "lucide-react";
+import { X, Copy, Eye, Pencil, Check } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useParams } from "react-router-dom";

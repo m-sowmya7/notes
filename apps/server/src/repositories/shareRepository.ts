@@ -79,6 +79,15 @@ export const ShareLinkRepository = {
         })
     },
 
+    update(id: string, data: Partial<{ access: AccessLevel; expiresAt: Date }>) {
+        return prisma.shareLink.update({
+            where: {
+                id
+            },
+            data
+        })
+    },
+
     delete(id: string) {
         return prisma.shareLink.delete({
             where: {
