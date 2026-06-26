@@ -1,10 +1,11 @@
 // Tasks : 
 // 1. share option in the options has to work
-// 2. add all the shared links and ability to delete the shared links so that they're no longer accessible
-import { MoreHorizontal, Search, ChevronDown, Star, Share2 } from "lucide-react";
+import { MoreHorizontal, Search, ChevronDown, Star, Share2, Link2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { type Page } from "../../types/pageType";
+import ManageLinksModal from "../components/ManageLinksModal";
+import ShareModal from "../components/ShareModal";
 
 const getFolderColor = (type?: string) => {
   switch (type) {
@@ -64,6 +65,10 @@ const DashboardPage = () => {
   const [sortBy, setSortBy] = useState<SortOption>("recent");
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [showLinksModal, setShowLinksModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [selectedPageTitle, setSelectedPageTitle] = useState("");
+  const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -208,7 +213,7 @@ const DashboardPage = () => {
                 key={page.id}
                 onClick={() => navigate(`/editor/${page.type}/${page.id}`)}
                 className={`flex w-full cursor-pointer items-center justify-between px-6 py-5 transition hover:bg-neutral-50 ${index !== sortedPages.length - 1
-                    ? "border-b border-neutral-100" : ""}`}>
+                  ? "border-b border-neutral-100" : ""}`}>
                 <div className="flex items-center gap-5">
                   <FolderIcon color={getFolderColor(page.type)} />
                   <div>
@@ -240,19 +245,32 @@ const DashboardPage = () => {
 
                   {activeMenu === page.id && (
                     <div
-                      onClick={(e) =>
-                        e.stopPropagation()
-                      }
-                      className="absolute right-0 top-8 z-50 w-52 rounded-xl border border-neutral-200 bg-white shadow-lg">
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute right-0 top-8 z-50 w-52 rounded-xl border border-neutral-200 bg-white shadow-lg"
+                    >
+                      <button
+                        onClick={() => {
+                          setSelectedPageId(page.id);
+                          setSelectedPageTitle(page.title);
+                          setShowShareModal(true);
+                          setActiveMenu(null);
+                        }}
+                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50"
+                      >
+                        <Share2 size={16} />
+                        Share
+                      </button>
 
                       <button
                         onClick={() => {
+                          setSelectedPageId(page.id);
+                          setShowLinksModal(true);
                           setActiveMenu(null);
-                          // open share modal here
                         }}
-                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50">
-                        <Share2 size={16} />
-                        Share
+                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50"
+                      >
+                        <Link2 size={16} />
+                        Manage Links
                       </button>
 
                       <button
@@ -260,9 +278,10 @@ const DashboardPage = () => {
                           toggleFavorite(page.id);
                           setActiveMenu(null);
                         }}
-                        className="flex w-full items-center gap-2 px-4 py-3 text-sm text-yellow-600 hover:bg-neutral-50">
+                        className="flex w-full items-center gap-2 px-4 py-3 text-sm text-yellow-600 hover:bg-neutral-50"
+                      >
                         <Star size={16} />
-                        UnFavorite
+                        {page.starred ? "Unfavorite" : "Favorite"}
                       </button>
                     </div>
                   )}
@@ -272,6 +291,23 @@ const DashboardPage = () => {
           )}
         </div>
       </section>
+      <ManageLinksModal
+        open={showLinksModal}
+        pageId={selectedPageId || ""}
+        onClose={() => {
+          setShowLinksModal(false);
+          setSelectedPageId(null);
+        }}
+      />
+      <ShareModal
+        open={showShareModal}
+        title={selectedPageTitle}
+        onClose={() => {
+          setShowShareModal(false);
+          setSelectedPageId(null);
+          setSelectedPageTitle("");
+        }}
+      />
     </main>
   );
 };

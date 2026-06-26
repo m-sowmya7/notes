@@ -64,9 +64,9 @@ const Sidebar = () => {
           onClick={() => setIsTemplatesModalOpen(true)}
           className="
             mt-3 flex w-full items-center justify-center gap-2 rounded-xl
-            bg-linear-to-b from-[#7c69ff] to-[#6652f0]
+            bg-[#A18D6D]
             px-4 py-3 text-sm font-semibold text-white
-            shadow-lg shadow-violet-500/20 transition hover:opacity-95">
+            shadow-lg shadow-[#F7F1DE] transition hover:opacity-95">
           <Plus size={18} />
           New Page
         </button>
@@ -102,7 +102,7 @@ const Sidebar = () => {
                 flex items-center gap-3 rounded-xl
                 px-4 py-3 text-sm font-medium transition
                 ${isActive
-                  ? 'bg-violet-100 text-black'
+                  ? 'bg-[#F7F1DE] text-black'
                   : 'text-neutral-700 hover:bg-neutral-100'
                 }
               `}>

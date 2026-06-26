@@ -1,5 +1,4 @@
 // Tasks : 
-// 1. improve the css, still has to look cool
 // 2. enable editing the card title and tasks
 // 3. user should be able to add new columns and delete existing ones
 // 4. make components for this, currently everything is in one file for ease of development but it should be split up
@@ -414,7 +413,7 @@ const DropIndicator = ({ beforeId, column }: {
     <div
       data-before={beforeId || "-1"}
       data-column={column}
-      className="my-1 h-0.5 w-full bg-[#7c69ff] opacity-0"
+      className="my-1 h-0.5 w-full bg-[#FFC6C6] opacity-0"
     />
   );
 };
@@ -519,8 +518,8 @@ const AddCard = ({
           w-full
           rounded-xl
           border
-          border-violet-200
-          bg-violet-50
+          border-[#643843]
+          bg-[#FFC6C6]/50
           p-3
           text-sm
           outline-none"
@@ -538,7 +537,7 @@ const AddCard = ({
 
         <button
           type="submit"
-          className="rounded-lg bg-[#7c69ff] px-3 py-2 text-sm text-white">
+          className="rounded-lg bg-[#FFC6C6] px-3 py-2 text-sm text-brown-700">
           Add
         </button>
       </div>

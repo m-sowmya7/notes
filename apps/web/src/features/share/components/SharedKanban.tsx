@@ -31,41 +31,123 @@ export default function SharedKanban({
   editable,
   onChange,
 }: Props) {
-  const [cards, setCards] = useState(content?.cards || []);
-  useEffect(() => setCards(content?.cards || []), [content]);
+  const [cards, setCards] = useState<Card[]>(content?.cards || []);
+  const [draggedCard, setDraggedCard] = useState<Card | null>(null);
+
+  useEffect(() => {
+    setCards(content?.cards || []);
+  }, [content]);
 
   const updateCards = (next: Card[]) => {
-    if (!editable) return;
     setCards(next);
-    onChange({ cards: next });
+
+    if (editable) {
+      onChange({
+        cards: next,
+      });
+    }
+  };
+
+  const handleDrop = (columnId: ColumnType) => {
+    if (!editable || !draggedCard) return;
+
+    const updatedCards = cards.map((card) =>
+      card.id === draggedCard.id
+        ? {
+            ...card,
+            column: columnId,
+          }
+        : card
+    );
+
+    updateCards(updatedCards);
+    setDraggedCard(null);
   };
 
   return (
-    <div className="flex gap-5 overflow-auto">
+    <div className="flex gap-5 overflow-x-auto pb-4">
       {columns.map((column) => (
         <div
           key={column.id}
-          className="bg-gray-100 rounded-lg p-4 min-w-70"
+          onDragOver={(e) => {
+            if (editable) e.preventDefault();
+          }}
+          onDrop={() => handleDrop(column.id)}
+          className="min-w-[280px] rounded-xl bg-gray-100 p-4"
         >
-          <h2 className="font-semibold mb-4">
+          <h2 className="mb-4 font-semibold text-gray-800">
             {column.title}
           </h2>
 
           <div className="space-y-3">
-            {cards.filter((card) => card.column === column.id).map((card) => (
-              <div
-                key={card.id}
-                className="bg-white rounded-md p-3 shadow-sm"
-              >
-                <input value={card.title} readOnly={!editable} onChange={(event) => updateCards(cards.map((value) => value.id === card.id ? { ...value, title: event.target.value } : value))} className="w-full bg-transparent outline-none" />
-                {editable && <button aria-label="Delete card" onClick={() => updateCards(cards.filter((value) => value.id !== card.id))} className="mt-2 hover:text-red-500"><Trash2 size={15} /></button>}
-              </div>
-            ))}
+            {cards
+              .filter((card) => card.column === column.id)
+              .map((card) => (
+                <div
+                  key={card.id}
+                  draggable={editable}
+                  onDragStart={() => setDraggedCard(card)}
+                  onDragEnd={() => setDraggedCard(null)}
+                  className={`rounded-md bg-white p-3 shadow-sm ${
+                    editable
+                      ? "cursor-move hover:shadow-md"
+                      : ""
+                  }`}
+                >
+                  <input
+                    value={card.title}
+                    readOnly={!editable}
+                    onChange={(e) =>
+                      updateCards(
+                        cards.map((c) =>
+                          c.id === card.id
+                            ? {
+                                ...c,
+                                title: e.target.value,
+                              }
+                            : c
+                        )
+                      )
+                    }
+                    placeholder="Untitled Card"
+                    className="w-full bg-transparent outline-none"
+                  />
+
+                  {editable && (
+                    <button
+                      aria-label="Delete card"
+                      onClick={() =>
+                        updateCards(
+                          cards.filter(
+                            (c) => c.id !== card.id
+                          )
+                        )
+                      }
+                      className="mt-2 text-gray-500 transition hover:text-red-500"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  )}
+                </div>
+              ))}
           </div>
 
           {editable && (
-            <button onClick={() => updateCards([...cards, { id: crypto.randomUUID(), title: "New card", column: column.id }])} className="mt-4 flex items-center gap-1 text-sm text-blue-500">
-              <Plus size={15} /> Add Card
+            <button
+              onClick={() =>
+                updateCards([
+                  ...cards,
+                  {
+                    id: crypto.randomUUID(),
+                    title: "",
+                    column: column.id,
+                  },
+                ])
+              }
+              className="mt-4 flex items-center gap-1 text-sm text-blue-500 transition hover:text-blue-600"
+            >
+              <Plus size={15} />
+              Add Card
             </button>
           )}
         </div>

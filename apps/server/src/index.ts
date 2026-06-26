@@ -5,7 +5,6 @@ import { prisma } from "../prisma/client"
 import pageRoutes from "./routes/documentRoutes"
 import userRoutes from "./routes/userRoutes"
 import shareRoutes from "./routes/shareRoutes"
-import userShareRoutes from "./routes/userShareRoutes"
 config()
 
 const PORT = process.env.PORT || 5000
@@ -16,7 +15,6 @@ app.use(express.json())
 
 app.use("/api/pages", pageRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/shares', userShareRoutes);
 app.use("/api/share-links", shareRoutes);
 
 async function startServer() {

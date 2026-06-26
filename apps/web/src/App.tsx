@@ -103,16 +103,15 @@ function App() {
         mt-7 cursor-pointer
         inline-flex items-center gap-3
         rounded-lg
-        bg-linear-to-b from-[#7c69ff] to-[#6652f0]
+        bg-[#A18D6D]
         px-5.5 py-3.5
         text-[1rem] font-bold text-white
-        shadow-[0_18px_30px_rgba(81,67,229,0.25)]
         transition-all duration-150
         hover:-translate-y-px
         hover:brightness-[1.02]
-        hover:shadow-[0_22px_36px_rgba(81,67,229,0.3)]
+        hover:shadow-[0_22px_36px_#F7F1DE]
         focus-visible:outline
-        focus-visible:outline-[rgba(101,82,240,0.32)]">
+        focus-visible:outline-[#a37575]">
           Get Started
 
           <span aria-hidden="true">
