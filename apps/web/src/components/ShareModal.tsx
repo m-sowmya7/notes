@@ -1,10 +1,6 @@
-// Tasks : 
-// 1. ofc access restrictions
-// 2. share to other apps (not necessary rn cause it makes a link)
 import { X, Copy, Eye, Pencil, Check } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { useParams } from "react-router-dom";
 
 type AccessLevel = "view" | "comment" | "edit";
 
@@ -12,8 +8,8 @@ type ShareModalProps = {
   open: boolean;
   onClose: () => void;
   title: string;
+  pageId: string;
 };
-
 
 const options = [
   {
@@ -39,23 +35,18 @@ const options = [
   },
 ];
 
-const ShareModal = ({
-  open,
-  onClose,
-  title,
-}: ShareModalProps) => {
+const ShareModal = ({ open, onClose, title, pageId }: ShareModalProps) => {
   const [access, setAccess] = useState<AccessLevel>("view");
   const [copied, setCopied] = useState(false);
   const [shareLink, setShareLink] = useState("");
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
-  const { id } = useParams();
   const generateShareLink = async (accessLevel: AccessLevel) => {
-    if(!id) return;
+    if(!pageId) return;
 
     try {
       setIsGeneratingLink(true);
 
-      const res = await fetch(`http://localhost:5000/api/share-links/${id}`, {
+      const res = await fetch(`http://localhost:5000/api/share-links/${pageId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -126,9 +117,7 @@ const ShareModal = ({
             <button
               key={id}
               onClick={() => setAccess(id as AccessLevel)}
-              className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 transition ${
-                access === id ? "border-violet-400 bg-violet-50" : "border-neutral-200"
-              }`}>
+              className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 transition ${access === id ? "border-violet-400 bg-violet-50" : "border-neutral-200"}`}>
               <div className="flex items-center gap-3">
                 <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${bgColor}`}>
                   <Icon size={18} />
@@ -164,11 +153,7 @@ const ShareModal = ({
 
             <button
               onClick={handleCopy}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-white transition ${
-                copied
-                  ? "bg-green-600 hover:bg-green-700"
-                  : "bg-violet-600 hover:bg-violet-700"
-              }`}>
+              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-white transition ${copied ? "bg-green-600 hover:bg-green-700" : "bg-violet-600 hover:bg-violet-700"}`}>
               <Copy size={16} />
               {copied ? "Copied!" : "Copy"}
             </button>

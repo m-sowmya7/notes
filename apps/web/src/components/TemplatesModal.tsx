@@ -9,7 +9,7 @@ type TemplatesModalProps = {
 const templates = [
   {
     id: "markdown",
-    title: "",
+    title: "Markdown",
     description: "Simple markdown document",
     type: "MARKDOWN",
     path: "/editor/markdown",
@@ -33,7 +33,7 @@ const templates = [
 
   {
     id: "list",
-    title: "",
+    title: "List",
     description: "Organize tasks and ideas",
     type: "LIST",
     path: "/editor/list",
@@ -70,7 +70,7 @@ const templates = [
 
   {
     id: "kanban",
-    title: "",
+    title: "Kanban Board",
     description: "Track workflows visually",
     type: "KANBAN",
     path: "/editor/kanban",
@@ -117,7 +117,7 @@ const templates = [
 const TemplatesModal = ({ open, onClose }: TemplatesModalProps) => {
   const navigate = useNavigate();
 
-  const createPage = async (title: string, type: string, path: string) => {
+  const createPage = async ( type: string, path: string) => {
     try {
       let content: any = {};
 
@@ -164,7 +164,7 @@ const TemplatesModal = ({ open, onClose }: TemplatesModalProps) => {
             "x-user-id": user || ""
           },
           body: JSON.stringify({
-            title,
+            title: "",
             type,
             content,
           }),
@@ -218,7 +218,6 @@ const TemplatesModal = ({ open, onClose }: TemplatesModalProps) => {
               key={template.id}
               onClick={() =>
                 createPage(
-                  template.title,
                   template.type,
                   template.path
                 )

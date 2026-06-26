@@ -1,18 +1,8 @@
-// Tasks : 
-// 1. online/offline status with websocket connection and make sure sync action is showing
 import { ArrowLeft, Star, Share2, MoreHorizontal, Trash2, Loader2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import ShareModal from "./ShareModal";
-
-type PageToolbarProps = {
-  pageId: string;
-  title: string;
-  starred: boolean;
-  isOnline: boolean;
-  isSyncing: boolean;
-  isModalOpen?: boolean;
-};
+import { type PageToolbarProps } from "../types/pageToolbarType";
 
 const PageToolbar = ({
   pageId,
@@ -42,8 +32,7 @@ const PageToolbar = ({
       if (!user) {
         throw new Error("User not found");
       }
-      const res = await fetch(
-        `http://localhost:5000/api/pages/${pageId}/star`,
+      const res = await fetch(`http://localhost:5000/api/pages/${pageId}/star`,
         {
           method: "PATCH",
           headers: {
@@ -103,13 +92,7 @@ const PageToolbar = ({
   }, []);
 
   return (
-    <header
-      className={`
-    sticky top-0 z-50
-    flex items-center justify-between
-    px-6 py-3
-    border-b border-neutral-200
-    transition-all
+    <header className={`sticky top-0 z-50 flex items-center justify-between px-6 py-3 border-b border-neutral-200 transition-all
     ${isModalOpen ? "bg-white/40 backdrop-blur-md" : "bg-white/90 backdrop-blur"}`}>
       {/* Left */}
       <div className="flex items-center gap-2">
@@ -168,12 +151,7 @@ const PageToolbar = ({
                 onClick={() => {
                   setShowDeleteModal(true)
                 }}
-                className="
-                  w-full
-                  flex items-center gap-2
-                  px-3 py-2
-                  text-red-500
-                  hover:bg-red-50">
+                className="w-full flex items-center gap-2 px-3 py-2 text-red-500 hover:bg-red-50">
                 <Trash2 size={16} />
                 Delete
               </button>
@@ -183,6 +161,7 @@ const PageToolbar = ({
       </div>
       <ShareModal
         open={shareOpen}
+        pageId={pageId}
         onClose={() => setShareOpen(false)}
         title={title}
       />
@@ -213,14 +192,7 @@ const PageToolbar = ({
               <button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="
-            flex items-center gap-2
-            rounded-md
-            bg-red-500
-            px-4 py-2
-            text-white
-            hover:bg-red-600
-            disabled:opacity-50">
+                className="flex items-center gap-2 rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600 disabled:opacity-50">
                 {isDeleting && (
                   <Loader2 size={16} className="animate-spin" />
                 )}

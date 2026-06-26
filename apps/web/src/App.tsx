@@ -55,16 +55,7 @@ function App() {
           Creative workspace
         </p>
 
-        <h1
-          className="
-            inline-flex flex-col gap-0.5
-            text-[clamp(3.4rem,8vw,5.25rem)]
-            font-black
-            leading-[0.93]
-            tracking-[-0.06em]
-            uppercase
-          "
-        >
+        <h1 className="inline-flex flex-col gap-0.5 text-[clamp(3.4rem,8vw,5.25rem)] font-black leading-[0.93] tracking-[-0.06em] uppercase">
           PROJECT
 
           <span className="inline-flex items-center gap-3">
@@ -76,44 +67,20 @@ function App() {
 
             <span
               aria-hidden="true"
-              className="
-                ml-0.5
-                translate-y-[-0.08em]
-                text-[0.5em]
-                text-[#8b735d]
-              ">
+              className="ml-0.5 translate-y-[-0.08em] text-[0.5em] text-[#8b735d]">
               ✦ 
             </span>
           </span>
         </h1>
 
-        <p
-          className="
-            mt-5
-            max-w-90
-            text-[1.02rem]
-            leading-[1.55]
-            text-[rgba(47,38,31,0.88)]">
+        <p className="mt-5 max-w-90 text-[1.02rem] leading-[1.55] text-[rgba(47,38,31,0.88)]">
           Plan, organize and explore creative ideas for your projects.
         </p>
 
         <Link
           to="/pages"
-          className="
-        mt-7 cursor-pointer
-        inline-flex items-center gap-3
-        rounded-lg
-        bg-[#A18D6D]
-        px-5.5 py-3.5
-        text-[1rem] font-bold text-white
-        transition-all duration-150
-        hover:-translate-y-px
-        hover:brightness-[1.02]
-        hover:shadow-[0_22px_36px_#F7F1DE]
-        focus-visible:outline
-        focus-visible:outline-[#a37575]">
+          className=" mt-7 cursor-pointer inline-flex items-center gap-3 rounded-lg bg-[#A18D6D] px-5.5 py-3.5 text-[1rem] font-bold text-white transition-all duration-150 hover:-translate-y-px hover:brightness-[1.02] hover:shadow-[0_22px_36px_#F7F1DE] focus-visible:outline focus-visible:outline-[#a37575]">
           Get Started
-
           <span aria-hidden="true">
             <ArrowRight />
           </span>

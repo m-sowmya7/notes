@@ -3,61 +3,12 @@
 import { MoreHorizontal, Search, ChevronDown, Star, Share2, Link2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { type Page } from "../../types/pageType";
+import { type Page } from "../types/pageType";
 import ManageLinksModal from "../components/ManageLinksModal";
 import ShareModal from "../components/ShareModal";
+import { getFolderColor, formatEditedTime, SORT_LABELS, type SortOption } from "../utils/dashboard/helpers";
+import { FolderIcon } from "../components/dashboard/FolderIcon";
 
-const getFolderColor = (type?: string) => {
-  switch (type) {
-    case "MARKDOWN":
-      return "#a8c48b";
-    case "LIST":
-      return "#8fc2ef";
-    case "KANBAN":
-      return "#d7a2dc";
-    default:
-      return "#cfcfcf";
-  }
-};
-
-const formatEditedTime = (dateString?: string) => {
-  if (!dateString) return "Recently created";
-
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMinutes = Math.floor(diffMs / 60000);
-
-  if (diffMinutes < 60) return `Edited ${diffMinutes} min ago`;
-
-  const diffHours = Math.floor(diffMinutes / 60);
-  if (diffHours < 24) return `Edited ${diffHours} hr ago`;
-
-  const diffDays = Math.floor(diffHours / 24);
-  return `Edited ${diffDays} day ago`;
-};
-
-const FolderIcon = ({ color }: { color: string }) => (
-  <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
-    <path
-      d="M3 9C3 6.79086 4.79086 5 7 5H15L18 8H35C37.2091 8 39 9.79086 39 12V27C39 29.2091 37.2091 31 35 31H7C4.79086 31 3 29.2091 3 27V9Z"
-      fill={color}
-      stroke="#4B4B4B"
-      strokeWidth="1.5"
-    />
-    <path d="M3 11H39" stroke="#4B4B4B" strokeWidth="1.5" />
-  </svg>
-);
-
-type SortOption = "recent" | "oldest" | "az" | "za" | "type";
-
-const SORT_LABELS: Record<SortOption, string> = {
-  recent: "Last Modified",
-  oldest: "Oldest First",
-  az: "A → Z",
-  za: "Z → A",
-  type: "By Page Type",
-};
 
 const DashboardPage = () => {
   const [pages, setPages] = useState<Page[]>([]);
@@ -144,15 +95,13 @@ const DashboardPage = () => {
         return b.title.localeCompare(a.title);
       case "oldest":
         return (
-          new Date(a.updatedAt ?? 0).getTime() -
-          new Date(b.updatedAt ?? 0).getTime()
+          new Date(a.updatedAt ?? 0).getTime() - new Date(b.updatedAt ?? 0).getTime()
         );
       case "type":
         return (a.type ?? "").localeCompare(b.type ?? "");
       default:
         return (
-          new Date(b.updatedAt ?? 0).getTime() -
-          new Date(a.updatedAt ?? 0).getTime()
+          new Date(b.updatedAt ?? 0).getTime() - new Date(a.updatedAt ?? 0).getTime()
         );
     }
   });
@@ -231,10 +180,7 @@ const DashboardPage = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-
-                        setActiveMenu(
-                          activeMenu === page.id ? null : page.id
-                        );
+                        setActiveMenu(activeMenu === page.id ? null : page.id);
                       }}>
                       <MoreHorizontal
                         size={20}
@@ -246,8 +192,7 @@ const DashboardPage = () => {
                   {activeMenu === page.id && (
                     <div
                       onClick={(e) => e.stopPropagation()}
-                      className="absolute right-0 top-8 z-50 w-52 rounded-xl border border-neutral-200 bg-white shadow-lg"
-                    >
+                      className="absolute right-0 top-8 z-50 w-52 rounded-xl border border-neutral-200 bg-white shadow-lg">
                       <button
                         onClick={() => {
                           setSelectedPageId(page.id);
@@ -255,8 +200,7 @@ const DashboardPage = () => {
                           setShowShareModal(true);
                           setActiveMenu(null);
                         }}
-                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50"
-                      >
+                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50">
                         <Share2 size={16} />
                         Share
                       </button>
@@ -267,8 +211,7 @@ const DashboardPage = () => {
                           setShowLinksModal(true);
                           setActiveMenu(null);
                         }}
-                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50"
-                      >
+                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50">
                         <Link2 size={16} />
                         Manage Links
                       </button>
@@ -278,8 +221,7 @@ const DashboardPage = () => {
                           toggleFavorite(page.id);
                           setActiveMenu(null);
                         }}
-                        className="flex w-full items-center gap-2 px-4 py-3 text-sm text-yellow-600 hover:bg-neutral-50"
-                      >
+                        className="flex w-full items-center gap-2 px-4 py-3 text-sm text-yellow-600 hover:bg-neutral-50">
                         <Star size={16} />
                         {page.starred ? "Unfavorite" : "Favorite"}
                       </button>
@@ -302,6 +244,7 @@ const DashboardPage = () => {
       <ShareModal
         open={showShareModal}
         title={selectedPageTitle}
+        pageId={selectedPageId ?? ""}
         onClose={() => {
           setShowShareModal(false);
           setSelectedPageId(null);

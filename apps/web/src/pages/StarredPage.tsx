@@ -1,74 +1,13 @@
+// Sharing is not working here
 import { MoreHorizontal, Search, Star, Share2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-const FolderIcon = ({ color }: { color: string }) => {
-  return (
-    <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
-      <path
-        d="M3 9C3 6.79086 4.79086 5 7 5H15L18 8H35C37.2091 8 39 9.79086 39 12V27C39 29.2091 37.2091 31 35 31H7C4.79086 31 3 29.2091 3 27V9Z"
-        fill={color}
-        stroke="#4B4B4B"
-        strokeWidth="1.5"
-      />
-      <path d="M3 11H39" stroke="#4B4B4B" strokeWidth="1.5" />
-    </svg>
-  );
-};
-
-const getFolderColor = (type?: string) => {
-  switch (type) {
-    case "MARKDOWN":
-      return "#a8c48b";
-
-    case "LIST":
-      return "#8fc2ef";
-
-    case "KANBAN":
-      return "#d7a2dc";
-
-    default:
-      return "#cfcfcf";
-  }
-};
-
-const formatEditedTime = (dateString?: string) => {
-  if (!dateString) {
-    return "Recently created";
-  }
-
-  const date = new Date(dateString);
-  const now = new Date();
-
-  const diffMs = now.getTime() - date.getTime();
-  const diffMinutes = Math.floor(diffMs / 60000);
-
-  if (diffMinutes < 60) {
-    return `Edited ${diffMinutes} min ago`;
-  }
-
-  const diffHours = Math.floor(diffMinutes / 60);
-
-  if (diffHours < 24) {
-    return `Edited ${diffHours} hr ago`;
-  }
-
-  const diffDays = Math.floor(diffHours / 24);
-
-  return `Edited ${diffDays} day ago`;
-};
-
-type Page = {
-  id: string;
-  title: string;
-  type: "MARKDOWN" | "LIST" | "KANBAN";
-  starred: boolean;
-  updatedAt?: string;
-};
+import { getFolderColor, formatEditedTime } from "../utils/dashboard/helpers";
+import { type Page } from "../types/pageType";
+import { FolderIcon } from "../components/dashboard/FolderIcon";
 
 const StarredPage = () => {
   const navigate = useNavigate();
-
   const [starredPages, setStarredPages] = useState<Page[]>([]);
   const [search, setSearch] = useState("");
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -180,10 +119,8 @@ const StarredPage = () => {
               (page, index) => (
                 <button
                   key={page.id}
-                  onClick={() => navigate(`/editor/${page.type}/${page.id}`)
-                  }
-                  className={`flex w-full items-center justify-between px-6 py-5 text-left transition hover:bg-neutral-50
-                    ${index !== filteredPages.length - 1 ? "border-b border-neutral-100" : ""}`}>
+                  onClick={() => navigate(`/editor/${page.type}/${page.id}`)}
+                  className={`flex w-full items-center justify-between px-6 py-5 text-left transition hover:bg-neutral-50 ${index !== filteredPages.length - 1 ? "border-b border-neutral-100" : ""}`}>
                   {/* Left */}
                   <div className="flex items-center gap-5">
                     <FolderIcon
@@ -213,12 +150,7 @@ const StarredPage = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-
-                          setActiveMenu(
-                            activeMenu === page.id
-                              ? null
-                              : page.id
-                          );
+                          setActiveMenu(activeMenu === page.id ? null : page.id);
                         }}>
                         <MoreHorizontal
                           size={20}
@@ -229,9 +161,7 @@ const StarredPage = () => {
 
                     {activeMenu === page.id && (
                       <div
-                        onClick={(e) =>
-                          e.stopPropagation()
-                        }
+                        onClick={(e) => e.stopPropagation()}
                         className="absolute right-0 top-8 z-50 w-52 rounded-xl border border-neutral-200 bg-white shadow-lg">
 
                         <button
