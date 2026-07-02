@@ -1,0 +1,123 @@
+tasks : 
+3. verify the necessasary files and folders in both ends
+5. recently deleted??? do i have to ?🫠
+6. collaboration for all the editors - yjs, web sockets etc and what are all needed
+7. create page for read only view and edit access page 
+
+--------------------
+so, basically now all the users are having the same database and right now every one are seeing the same pages
+how to fix that, prolly have to write User model
+
+and when the person shares their page : 
+1. choose the permissions to be allowed (view, comment[not available for now], and edit)
+2. copy the link and share
+3. anonymous names / chosen names by the recieveing user, its like creating a live session in excalidraw
+4. once the live session stops the link becomes invalid and cannot open the page for edit
+5. creating only live session for editing permissions cause only to view no expiry (if that optimal)
+6. maybe in the next versions we can add collaborators so that 
+   people can continuously have access for edits, comments and have them listed as contributors to the page
+7. when multiple people are working on a page, their icons should be visible on the tool bar
+--------------------
+backend structure : 
+
+apps/server
+│
+├── src
+│   ├── api
+│   │   ├── documents
+│   │   ├── share
+│   │   └── permissions
+│   │
+│   ├── websocket
+│   │   ├── rooms
+│   │   ├── presence
+│   │   └── yjs
+│   │
+│   ├── services
+│   │   ├── documentService
+│   │   ├── shareService
+│   │   └── syncService
+│   │
+│   ├── db
+│   │   ├── prisma
+│   │   └── repositories
+│   │
+│   ├── middleware
+│   │
+│   └── utils
+│
+└── prisma
+    └── schema.prisma
+
+------========================----------------======================---------------------------------
+Information for me : 
+Backend - 
+id is the primary key of the current table.
+
+For example, in your ShareLink model:
+
+model ShareLink {
+  id        String @id @default(cuid())
+  pageId    String
+  token     String @unique
+  access    AccessLevel
+
+  page Page @relation(fields: [pageId], references: [id])
+}
+
+Here:
+
+id → identifies a ShareLink
+Every share link has its own unique id
+
+Example:
+
+ShareLink
+---------
+id      = sl_123
+pageId  = page_456
+token   = abcxyz
+pageId
+
+pageId is a foreign key.
+
+It stores the ID of the page that this share link belongs to.
+
+Page
+----
+id = page_456
+title = "Meeting Notes"
+ShareLink
+---------
+id      = sl_123
+pageId  = page_456
+token   = abcxyz
+
+Notice:
+
+sl_123 identifies the share link
+page_456 identifies the page
+
+===========================================================
+used React portals here - sharemodal, have to dig deep into that along with dexie (indexedDB)
+
+===============================================================
+Phase 1 — Infrastructure
+Install @hocuspocus/server, yjs, @tiptap/extension-collaboration, @tiptap/extension-collaboration-cursor, y-indexeddb, and y-websocket (or use Hocuspocus directly).
+Create server/src/live/ and start a standalone Hocuspocus server.
+Verify two browser tabs can edit the same test document in real time.
+Phase 2 — Persistence
+Implement onLoadDocument and onStoreDocument in Hocuspocus to load/save a page's Yjs state from PostgreSQL.
+Keep your existing REST endpoints for page CRUD unchanged.
+Phase 3 — Room management
+Add liveRoutes, liveService, and liveRepository.
+Support starting a live session, generating an invite link, joining by room ID, and ending the session.
+Phase 4 — Frontend integration
+Create features/live/ with hooks and services.
+Add a Start Live Session button to PageToolbar.
+Swap the normal editor for a collaborative editor when a live session is active.
+Phase 5 — Presence
+Use Yjs Awareness to display your randomly generated participant names, cursor colors, and live cursors.
+Show a participant list and online count similar to Excalidraw.
+Phase 6 — Polish
+Add reconnect handling, offline support with y-indexeddb, snapshot throttling, session cleanup, and eventually features like shared undo/redo or comments.
