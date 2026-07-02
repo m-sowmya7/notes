@@ -54,9 +54,9 @@ export default function SharedKanban({
     const updatedCards = cards.map((card) =>
       card.id === draggedCard.id
         ? {
-            ...card,
-            column: columnId,
-          }
+          ...card,
+          column: columnId,
+        }
         : card
     );
 
@@ -73,7 +73,7 @@ export default function SharedKanban({
             if (editable) e.preventDefault();
           }}
           onDrop={() => handleDrop(column.id)}
-          className="min-w-[280px] rounded-xl bg-gray-100 p-4"
+          className="min-w-[280px] rounded-xl bg-red-100/50 p-4 border border-black border-1"
         >
           <h2 className="mb-4 font-semibold text-gray-800">
             {column.title}
@@ -88,13 +88,12 @@ export default function SharedKanban({
                   draggable={editable}
                   onDragStart={() => setDraggedCard(card)}
                   onDragEnd={() => setDraggedCard(null)}
-                  className={`rounded-md bg-white p-3 shadow-sm ${
-                    editable
+                  className={`rounded-md bg-white p-3 shadow-sm border-1 ${editable
                       ? "cursor-move hover:shadow-md"
                       : ""
-                  }`}
+                    }`}
                 >
-                  <input
+                  {/* <input
                     value={card.title}
                     readOnly={!editable}
                     onChange={(e) =>
@@ -127,7 +126,40 @@ export default function SharedKanban({
                     >
                       <Trash2 size={15} />
                     </button>
-                  )}
+                  )} */}
+                  <div className="flex items-center gap-2">
+                    <input
+                      value={card.title}
+                      readOnly={!editable}
+                      onChange={(e) =>
+                        updateCards(
+                          cards.map((c) =>
+                            c.id === card.id
+                              ? {
+                                ...c,
+                                title: e.target.value,
+                              }
+                              : c
+                          )
+                        )
+                      }
+                      placeholder="Untitled Card"
+                      className={`flex-1 bg-transparent outline-none ${editable ? "cursor-text" : ""
+                        }`}
+                    />
+
+                    {editable && (
+                      <button
+                        aria-label="Delete card"
+                        onClick={() =>
+                          updateCards(cards.filter((c) => c.id !== card.id))
+                        }
+                        className="shrink-0 text-gray-500 transition hover:text-red-500"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
           </div>
@@ -144,8 +176,7 @@ export default function SharedKanban({
                   },
                 ])
               }
-              className="mt-4 flex items-center gap-1 text-sm text-blue-500 transition hover:text-blue-600"
-            >
+              className="mt-4 flex items-center gap-1 text-sm text-black">
               <Plus size={15} />
               Add Card
             </button>

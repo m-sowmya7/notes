@@ -46,7 +46,7 @@ export default function SharedList({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 bg-blue-100/50 p-2 rounded-xl border border-black border-1">
       {items.map((item) => (
         <div
           key={item.id}

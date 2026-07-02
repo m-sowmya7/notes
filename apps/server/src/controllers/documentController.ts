@@ -3,9 +3,9 @@ import { PageService } from '../services/documentService';
 
 const getUserId = (req: Request) => req.header('x-user-id');
 
-const serializeError = (error: unknown) => ({
-    error: error instanceof Error ? error.message : String(error),
-});
+// const serializeError = (error: unknown) => ({
+//     error: error instanceof Error ? error.message : String(error),
+// });
 
 export const createPage = async (req: Request, res: Response) => {
     try {
@@ -17,7 +17,8 @@ export const createPage = async (req: Request, res: Response) => {
         res.status(201).json(page);
     }
     catch (error) {
-        res.status(500).json(serializeError(error));
+        // res.status(500).json(serializeError(error));
+        res.status(500).json({ error: 'Failed to create page' });
     }
 }
 
@@ -30,7 +31,8 @@ export const getPages = async (req: Request, res: Response) => {
         res.json(pages);
     }
     catch (error) {
-        res.status(500).json(serializeError(error));
+        // res.status(500).json(serializeError(error));
+        res.status(500).json({ error: 'Failed to load pages' });
     }
 }
 
@@ -44,7 +46,8 @@ export const getPageById = async (req: Request, res: Response) => {
         res.json(page);
     }
     catch (error) {
-        res.status(500).json(serializeError(error));
+        // res.status(500).json(serializeError(error));
+        res.status(500).json({ error: 'Failed to load the page' });
     }
 };
 
@@ -58,7 +61,8 @@ export const updatePage = async (req: Request, res: Response) => {
         res.json(page);
     }
     catch (error) {
-        res.status(500).json(serializeError(error));
+        // res.status(500).json(serializeError(error));
+        res.status(500).json({ error: 'Failed to update the page' });
     }
 }
 
@@ -71,7 +75,8 @@ export const deletePage = async (req: Request, res: Response) => {
         res.status(204).send();
     }
     catch(error) {
-        res.status(500).json(serializeError(error));
+        // res.status(500).json(serializeError(error));
+        res.status(500).json({ error: 'Failed to delete the page' });
     }
 }
 
@@ -83,7 +88,8 @@ export const toggleStar = async (req: Request, res: Response) => {
     const page = await PageService.toggleStar(String(req.params.id), userId);
     res.json(page);
   } catch (error) {
-    res.status(500).json(serializeError(error));
+    // res.status(500).json(serializeError(error));
+    res.status(500).json({ error: 'Failed to toggle the page as favourite' });
   }
 };
 
@@ -96,6 +102,7 @@ export const getStarredPages = async (req: Request, res: Response) => {
         res.json(pages);
     }
     catch(error) {
-        res.status(500).json(serializeError(error));
+        // res.status(500).json(serializeError(error));
+        res.status(500).json({ error: 'Failed to load favourite pages' });
     }
 }

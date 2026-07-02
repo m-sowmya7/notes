@@ -36,12 +36,12 @@ const options = [
 ];
 
 const ShareModal = ({ open, onClose, title, pageId }: ShareModalProps) => {
-  const [access, setAccess] = useState<AccessLevel>("view");
+  const [access, setAccess] = useState<AccessLevel | null>(null);
   const [copied, setCopied] = useState(false);
   const [shareLink, setShareLink] = useState("");
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
   const generateShareLink = async (accessLevel: AccessLevel) => {
-    if(!pageId) return;
+    if (!pageId) return;
 
     try {
       setIsGeneratingLink(true);
@@ -51,9 +51,9 @@ const ShareModal = ({ open, onClose, title, pageId }: ShareModalProps) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           access: accessLevel === "view" ? "VIEW" : "EDIT",
-         }),
+        }),
       });
 
       if (!res.ok) {
@@ -63,7 +63,7 @@ const ShareModal = ({ open, onClose, title, pageId }: ShareModalProps) => {
       const data = await res.json();
       setShareLink(data.url);
     }
-    catch(error) {
+    catch (error) {
       console.error("Error generating share link:", error);
     }
     finally {
@@ -72,12 +72,20 @@ const ShareModal = ({ open, onClose, title, pageId }: ShareModalProps) => {
   }
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !access) return;
     generateShareLink(access);
   }, [open, access]);
 
+  useEffect(() => {
+    if (!open) {
+      setAccess(null);
+      setShareLink("");
+      setCopied(false);
+    }
+  }, [open]);
+
   const handleCopy = async () => {
-    if(!shareLink) return;
+    if (!shareLink) return;
     try {
       await navigator.clipboard.writeText(shareLink);
       setCopied(true);
@@ -116,7 +124,11 @@ const ShareModal = ({ open, onClose, title, pageId }: ShareModalProps) => {
           {options.map(({ id, title, description, icon: Icon, bgColor }) => (
             <button
               key={id}
-              onClick={() => setAccess(id as AccessLevel)}
+              onClick={() => {
+                setShareLink("");
+                setCopied(false);
+                setAccess(id as AccessLevel);
+              }}
               className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 transition ${access === id ? "border-violet-400 bg-violet-50" : "border-neutral-200"}`}>
               <div className="flex items-center gap-3">
                 <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${bgColor}`}>
@@ -140,27 +152,33 @@ const ShareModal = ({ open, onClose, title, pageId }: ShareModalProps) => {
           ))}
         </div>
 
-        {/* Share Link */}
-        <div className="mt-6">
-          <p className="mb-2 text-sm font-medium">Share The Vibe</p>
+        {access && (
+          <div className="mt-6">
+            <p className="mb-2 text-sm font-medium">Share The Vibe</p>
 
-          <div className="flex gap-2">
-            <input
-              readOnly
-              value={isGeneratingLink ? "Whipping up the link..." : shareLink}
-              className="flex-1 rounded-xl border border-neutral-300 px-3 py-2 outline-none"
-            />
+            <div className="flex gap-2">
+              <input
+                readOnly
+                value={isGeneratingLink ? "Whipping up the link..." : shareLink}
+                className="flex-1 rounded-xl border border-neutral-300 px-3 py-2 outline-none"
+              />
 
-            <button
-              onClick={handleCopy}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-white transition ${copied ? "bg-green-600 hover:bg-green-700" : "bg-violet-600 hover:bg-violet-700"}`}>
-              <Copy size={16} />
-              {copied ? "Copied!" : "Copy"}
-            </button>
+              <button
+                onClick={handleCopy}
+                disabled={isGeneratingLink || !shareLink}
+                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-white transition ${copied
+                  ? "bg-green-600 hover:bg-green-700"
+                  : "bg-violet-600 hover:bg-violet-700"
+                  } disabled:cursor-not-allowed disabled:opacity-50`}
+              >
+                <Copy size={16} />
+                {copied ? "Copied!" : "Copy"}
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
-    </div>,
+    </div >,
     document.body
   );
 };

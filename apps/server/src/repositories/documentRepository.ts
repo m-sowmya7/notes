@@ -1,6 +1,7 @@
 import { prisma } from '../../prisma/client';
 import { PageType } from '../generated/prisma/enums';
 
+// functions that are used to interact with the database related to pages
 export const PageRepository = {
     create(data: {
         title: string;
@@ -8,25 +9,19 @@ export const PageRepository = {
         type: PageType;
         content: any;
     }) {
-        return prisma.page.create({
-            data,
-        });
+        return prisma.page.create({ data });
     },
 
     findAll(ownerId: string) {
         return prisma.page.findMany({
-            where: {
-                ownerId,
-            },
-            orderBy: {
-                updatedAt: "desc",
-            },
+            where: { ownerId },
+            orderBy: { updatedAt: "desc" },
         });
     },
 
     findById(id: string, ownerId: string) {
         return prisma.page.findFirst({
-            where: {id, ownerId},
+            where: { id, ownerId },
         });
     },
 
@@ -39,8 +34,7 @@ export const PageRepository = {
         }
     ) {
         return prisma.page.update({
-            where: {id, ownerId},
-            data,
+            where: { id, ownerId }, data, 
         });
     },
 
@@ -50,14 +44,10 @@ export const PageRepository = {
 
     async toggleStar(id: string, ownerId: string) {
         const page = await prisma.page.findFirst({ where: { id, ownerId } });
-        if(!page) {
-            throw new Error("Page not found");
-        }
+        if(!page) { throw new Error("Page not found for toggle star function") }
         return prisma.page.update({
             where: { id, ownerId },
-            data: {
-                starred: !page?.starred
-            }
+            data: { starred: !page?.starred }
         })
     }
 };

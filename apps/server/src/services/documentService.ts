@@ -1,6 +1,7 @@
 import { PageRepository } from '../repositories/documentRepository';
 import { PageType } from '../generated/prisma/enums';
 
+// all the business logic for pages will be here, this is where we will call the repository functions
 export const PageService = {
     async createPage(title: string, type: PageType, content: any, ownerId: string) {
         return PageRepository.create({title, type, content, ownerId});

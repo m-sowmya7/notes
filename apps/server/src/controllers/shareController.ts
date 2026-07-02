@@ -53,6 +53,7 @@ export const revokeAccess = async (req: Request, res: Response) => {
 
 export const createShareLink = async (req: Request, res: Response) => {
     try {
+        // why do i have to store like this? why cant i just do req.params.pageId?
         const { pageId: rawPageId } = req.params;
         const { access } = req.body;
         const pageId = Array.isArray(rawPageId) ? rawPageId[0] : rawPageId;
@@ -84,7 +85,7 @@ export const getSharePageByToken = async (req: Request, res: Response) => {
         });
     }
     catch(error) {
-        res.status(404).json({ error: "Invalid share link"});
+        res.status(404).json({ error: "Invalid share link token"});
     }
 }
 

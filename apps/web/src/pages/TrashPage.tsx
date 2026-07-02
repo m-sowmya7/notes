@@ -25,9 +25,8 @@ const deletedPages: DeletedPage[] = [
 ];
 
 const TrashPage = () => {
-  return (
-    <div className="p-8 bg-[#f6f3ef] min-h-screen">
-      <h1 className="text-5xl font-black text-[#1f1f1f] mb-6">
+  // return (
+  {/* <h1 className="text-5xl font-black text-[#1f1f1f] mb-6">
         Trash
       </h1>
 
@@ -62,9 +61,26 @@ const TrashPage = () => {
             </div>
           </div>
         ))}
-      </div>
-    </div>
-  );
+      </div> */}
+  // );
+
+  return (
+    <main className="flex min-h-screen bg-[#f6f3ef]">
+      <section className="flex-1 px-12 py-10">
+        <div className="flex items-center justify-between">
+          <h1 className="text-5xl font-black text-[#1f1f1f]">
+            Trash
+          </h1>
+        </div>
+
+
+        <div className="mt-8 ">
+          Be Right Back! This page is under construction...
+        </div>
+
+      </section>
+    </main>
+  )
 }
 
 export default TrashPage;

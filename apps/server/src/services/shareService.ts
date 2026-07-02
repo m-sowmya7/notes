@@ -3,6 +3,7 @@ import { AccessLevel } from "../generated/prisma/enums";
 import { prisma } from "../../prisma/client";
 import crypto from "crypto";
 
+// not being used for now
 export const ShareService = {
   async sharePage(pageId: string, userId: string, access: AccessLevel) {
     return ShareRepository.sharePages(
@@ -29,7 +30,14 @@ export const ShareService = {
 export const ShareLinkService = {
   async createShareLink(pageId: string, access: AccessLevel) {
     const token = crypto.randomBytes(16).toString("hex");
-    return ShareLinkRepository.create(pageId, token, access);
+    if(!token) {
+      throw new Error("Failed to generate share link token");
+    }
+    return ShareLinkRepository.create(
+      pageId,
+      token, 
+      access
+    );
   },
 
   async getSharePageByToken(token: string) {
@@ -44,7 +52,9 @@ export const ShareLinkService = {
   },
 
   async getPageLinks(pageId: string) {
-    return ShareLinkRepository.findByPage(pageId);
+    return ShareLinkRepository.findByPage(
+      pageId
+    );
   },
 
   async updateSharedPage(pageId: string, data: { title?: string; content?: any }) {
@@ -55,6 +65,8 @@ export const ShareLinkService = {
   },
 
   async deleteShareLink(id: string) {
-    return ShareLinkRepository.delete(id);
+    return ShareLinkRepository.delete(
+      id
+    );
   }
 }

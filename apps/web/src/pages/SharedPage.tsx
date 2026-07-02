@@ -1,7 +1,6 @@
-// Tasks:
-// 1. Obviously the ui is basic, gotta change that 
-// 2. add a button to save the page (where edit access is given) to that user's profile
-// 3. the changes are not being saved to the database, need to fix that, or do i need sockets for that?
+// Tasks: 
+// 1. button to save the page (where edit access is given) to that user's profile
+// for now im getting the userId in the localhost when the user receives the share link, should i user that or have to go with auth context
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import SharedMarkdown from "../features/share/components/SharedMarkdown";
