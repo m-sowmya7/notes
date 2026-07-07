@@ -3,6 +3,8 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import ShareModal from "./ShareModal";
 import { type PageToolbarProps } from "../types/pageToolbarType";
+import { mockParticipants } from "./live/LiveParticipants";
+import LiveParticipants from "./live/LiveParticipants";
 
 const PageToolbar = ({
   pageId,
@@ -115,7 +117,7 @@ const PageToolbar = ({
           ) : (
             <div
               className={`flex items-center gap-1 text-sm ${isOnline ? "text-green-600" : "text-neutral-500"}`}>
-              <div className={`h-2 w-2 rounded-full ${isOnline ? "bg-green-500" : "bg-neutral-400"}`}/>
+              <div className={`h-2 w-2 rounded-full ${isOnline ? "bg-green-500" : "bg-neutral-400"}`} />
               {isOnline ? "Online" : "Offline"}
             </div>
           )}
@@ -124,6 +126,12 @@ const PageToolbar = ({
 
       {/* Right */}
       <div className="flex items-center gap-1">
+
+        <LiveParticipants
+          participants={mockParticipants}
+          maxVisible={4}
+        />
+
         <button className="p-2 rounded-md hover:bg-neutral-100" onClick={() => setShareOpen(true)}>
           <Share2 size={18} />
         </button>

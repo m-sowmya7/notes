@@ -2,21 +2,17 @@ tasks :
 3. verify the necessasary files and folders in both ends
 5. recently deleted??? do i have to ?🫠
 6. collaboration for all the editors - yjs, web sockets etc and what are all needed
-7. create page for read only view and edit access page 
 
 --------------------
-so, basically now all the users are having the same database and right now every one are seeing the same pages
-how to fix that, prolly have to write User model
 
 and when the person shares their page : 
-1. choose the permissions to be allowed (view, comment[not available for now], and edit)
+1. choose the permissions to be allowed (view, comment[not available for now], and edit, live session)
 2. copy the link and share
 3. anonymous names / chosen names by the recieveing user, its like creating a live session in excalidraw
 4. once the live session stops the link becomes invalid and cannot open the page for edit
 5. creating only live session for editing permissions cause only to view no expiry (if that optimal)
-6. maybe in the next versions we can add collaborators so that 
-   people can continuously have access for edits, comments and have them listed as contributors to the page
-7. when multiple people are working on a page, their icons should be visible on the tool bar
+6. maybe in the next versions we can add collaborators so that people can continuously have access for edits, comments and have them listed as contributors to the page
+7. when multiple people are working on a page, their icons should be visible on the tool bar and their presense on the page has to be displayed
 --------------------
 backend structure : 
 
@@ -121,3 +117,35 @@ Use Yjs Awareness to display your randomly generated participant names, cursor c
 Show a participant list and online count similar to Excalidraw.
 Phase 6 — Polish
 Add reconnect handling, offline support with y-indexeddb, snapshot throttling, session cleanup, and eventually features like shared undo/redo or comments.
+
+============================================================================
+One thing I'd improve in the schema
+
+Since your UI allows:
+
+Start Live Session -> End Session -> Start Again
+
+I'd slightly modify LiveRoom.
+
+Instead of
+
+active Boolean
+
+I'd use
+
+status LiveRoomStatus
+enum LiveRoomStatus {
+    ACTIVE
+    ENDED
+}
+
+Why?
+
+Because later you might add:
+
+ACTIVE
+PAUSED
+ENDED
+EXPIRED
+
+without another migration.

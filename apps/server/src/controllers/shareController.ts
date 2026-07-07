@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
-import { ShareService, ShareLinkService } from '../services/shareService';
+import { ShareService, ShareLinkService, LiveSessionService } from '../services/shareService';
 import dotenv from 'dotenv';
 dotenv.config();
 
+// Share Page related controllers
 export const sharePage = async (req: Request, res: Response) => {
     try {
         // why do i have to store like this? why cant i just do req.params.pageId?
@@ -51,6 +52,7 @@ export const revokeAccess = async (req: Request, res: Response) => {
     }
 };
 
+// Share link related controllers
 export const createShareLink = async (req: Request, res: Response) => {
     try {
         // why do i have to store like this? why cant i just do req.params.pageId?
@@ -127,5 +129,60 @@ export const deleteShareLink = async (req: Request, res: Response) => {
     }
     catch(error) {
         res.status(500).json({ error: "Failed to delete share link" });
+    }
+}
+
+// Live session related controllers
+export const createLiveSession = async (req: Request, res: Response) => {
+    try {
+        const { pageId: rawPageId } = req.params;
+        const userId = req.body.userId;
+        const pageId = Array.isArray(rawPageId) ? rawPageId[0] : rawPageId;
+        const session = await LiveSessionService.createLiveSession(pageId, userId);
+        res.status(201).json(session);
+    }
+    catch(error) {
+        res.status(500).json({ error: "Failed to create a live session" });
+    }
+}
+
+// createLiveSession() -> POST /live/:pageId/start
+// getLiveSession() -> GET /live/invite/:inviteToken
+// getLiveSessionStatus() -> GET /live/page/:pageId
+// endLiveSession() -> PATCH /live/:sessionId/end
+
+export const getLiveSession = async (req: Request, res: Response) => {
+    try {
+        const { inviteToken: rawInviteToken } = req.params;
+        const inviteToken = Array.isArray(rawInviteToken) ? rawInviteToken[0] : rawInviteToken;
+        const session = await LiveSessionService.getLiveSessionByToken(inviteToken);
+        res.status(200).json(session);
+    }
+    catch(error) {
+        res.status(404).json({ error: "Failed to get the session" });
+    }
+}
+
+export const getLiveSessionStatus = async (req: Request, res: Response) => {
+    try {
+        const { pageId: rawPageId } = req.params;
+        const pageId = Array.isArray(rawPageId) ? rawPageId[0] : rawPageId;
+        const status = await LiveSessionService.getLiveSessionActiveStatus(pageId);
+        res.status(200).json(status);
+    }
+    catch(error) {
+        res.status(500).json({ error: "Failed to get the session status" });
+    }
+}
+
+export const endLiveSession = async (req: Request, res: Response) => {
+    try {
+        const { sessionId: rawSessionId } = req.params;
+        const sessionId = Array.isArray(rawSessionId) ? rawSessionId[0] : rawSessionId;
+        await LiveSessionService.endLiveSession(sessionId);
+        res.status(200).json({ success: true });
+    }
+    catch(error) {
+        res.status(500).json({ error: "Failed to end the session" });
     }
 }

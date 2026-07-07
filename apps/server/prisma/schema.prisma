@@ -26,7 +26,6 @@ model PageShare {
   access AccessLevel
   page   Page        @relation(fields: [pageId], references: [id])
   user   User        @relation(fields: [userId], references: [id])
-
   @@unique([pageId, userId])
 }
 
@@ -36,6 +35,7 @@ model User {
   createdAt DateTime    @default(now())
   pages     Page[]
   shares    PageShare[]
+  liveRooms LiveRoom[]
 }
 
 model Page {
@@ -50,6 +50,20 @@ model Page {
   owner      User        @relation(fields: [ownerId], references: [id])
   shares     PageShare[]
   shareLinks ShareLink[]
+  liveRooms  LiveRoom[]
+}
+
+model LiveRoom {
+  id          String   @id @default(uuid())
+  pageId      String
+  page        Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  inviteToken String   @unique
+  active      Boolean  @default(true)
+  createdBy   String
+  owner        User    @relation(fields: [createdBy], references: [id])
+  startedAt   DateTime @default(now())
+  endedAt     DateTime?
+  @@index([pageId])
 }
 
 enum AccessLevel {

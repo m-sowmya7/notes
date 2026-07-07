@@ -1,4 +1,4 @@
-import { X, Copy, Eye, Pencil, Check } from "lucide-react";
+import { X, Copy, Eye, Pencil, Check, Radio } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 
@@ -33,6 +33,13 @@ const options = [
     icon: Pencil,
     bgColor: "bg-purple-100",
   },
+  {
+    id: "live",
+    title: "Start a Live Collaboration",
+    description: "Partner up and vibe together",
+    icon: Radio,
+    bgColor: "bg-green-100",
+  }
 ];
 
 const ShareModal = ({ open, onClose, title, pageId }: ShareModalProps) => {

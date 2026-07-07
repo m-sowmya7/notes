@@ -83,6 +83,54 @@ export const ShareLinkRepository = {
     }
 }
 
+// LiveSessionRepository is for managing live collaboration sessions, including creating, retrieving, and ending sessions.
+export const LiveSessionRepository = {
+    createSession(pageId: string, createdBy: string, inviteToken: string) {
+        return prisma.liveRoom.create({
+            data: { pageId, createdBy, inviteToken }
+        })
+    },
+
+    getSessionById(id: string) {
+        return prisma.liveRoom.findUnique({
+            where: { id },
+            include: { page: true }
+        })
+    },
+
+    getSessionByInviteToken(inviteToken: string) {
+        return prisma.liveRoom.findUnique({
+            where: { inviteToken },
+            include: { page: true } // include the associated page in the result
+        })
+    },
+
+    getActiveSessionByPageId(pageId: string) {
+        return prisma.liveRoom.findFirst({
+            where: { pageId, active: true }
+        })
+    },
+
+    getActiveSession(id: string) {
+        return prisma.liveRoom.findFirst({
+            where: { active: true, id}
+        })
+    },
+
+    endSession(id: string) {
+        return prisma.liveRoom.update({
+            where: { id },
+            data: {
+                active: false,
+                endedAt: new Date() // set the expiration time to now
+            }
+        })
+    },
+
+    // optional function to delete expired sessions (dont think we need this now, has to be a cron job so for optimization and scaling)
+    // deleteExpiredSessions() { }
+}
+
 // ============================================================================================
 // Since you're looking up a share link, you'll almost always want to know which page it points to. Including the page saves you from making a second database query like:
 // const shareLink = await prisma.shareLink.findUnique({ where: { token } });
