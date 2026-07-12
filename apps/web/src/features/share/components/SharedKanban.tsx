@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
+import * as Y from "yjs";
 
 type ColumnType = "backlog" | "todo" | "doing" | "done";
 
@@ -16,6 +17,7 @@ export interface KanbanContent {
 interface Props {
   content: KanbanContent;
   editable: boolean;
+  liveYdoc?: Y.Doc;
   onChange: (content: KanbanContent) => void;
 }
 
@@ -29,22 +31,55 @@ const columns: Array<{ id: ColumnType; title: string }> = [
 export default function SharedKanban({
   content,
   editable,
+  liveYdoc,
   onChange,
 }: Props) {
   const [cards, setCards] = useState<Card[]>(content?.cards || []);
   const [draggedCard, setDraggedCard] = useState<Card | null>(null);
 
   useEffect(() => {
+    if (liveYdoc) return;
     setCards(content?.cards || []);
-  }, [content]);
+  }, [content, liveYdoc]);
+
+  useEffect(() => {
+    if (!liveYdoc) return;
+
+    const yCards = liveYdoc.getArray<Card>("cards");
+
+    if (yCards.length === 0 && content?.cards?.length) {
+      yCards.insert(0, content.cards);
+    }
+
+    const syncCards = () => {
+      const next = yCards.toArray();
+      setCards(next);
+
+      if (editable) {
+        onChange({ cards: next });
+      }
+    };
+
+    syncCards();
+    yCards.observe(syncCards);
+
+    return () => yCards.unobserve(syncCards);
+  }, [content?.cards, editable, liveYdoc, onChange]);
 
   const updateCards = (next: Card[]) => {
+    if (liveYdoc) {
+      const yCards = liveYdoc.getArray<Card>("cards");
+      liveYdoc.transact(() => {
+        yCards.delete(0, yCards.length);
+        yCards.insert(0, next);
+      });
+      return;
+    }
+
     setCards(next);
 
     if (editable) {
-      onChange({
-        cards: next,
-      });
+      onChange({ cards: next });
     }
   };
 

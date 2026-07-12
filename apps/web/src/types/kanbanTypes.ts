@@ -1,6 +1,7 @@
 import { type DragEvent, type Dispatch, type SetStateAction } from "react";
 
-export type ColumnType = "backlog" | "todo" | "doing" | "done";
+// Boards support user-defined columns, so card column IDs cannot be a fixed union.
+export type ColumnType = string;
 
 export type CardType = {
   title: string;

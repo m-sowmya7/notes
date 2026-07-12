@@ -4,12 +4,13 @@ import PageToolbar from "../components/PageToolbar";
 import { useTemplatesModal } from "../context/TemplatesModalContext";
 import { useParams } from "react-router-dom";
 import { db } from "../db/localDb";
+import {
+  createListItem,
+  normalizeListItems,
+  type NormalizedListItem,
+} from "../utils/listItems";
 
-type ListItem = {
-  id: string;
-  text: string;
-  completed: boolean;
-};
+type ListItem = NormalizedListItem;
 
 const user = localStorage.getItem("userId") ?? "";
 
@@ -22,19 +23,13 @@ const List = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isSyncing, setIsSyncing] = useState(false);
 
-  const [items, setItems] = useState<ListItem[]>([
-    {
-      id: crypto.randomUUID(),
-      text: "",
-      completed: false,
-    },
-  ]);
+  const [items, setItems] = useState<ListItem[]>([createListItem()]);
 
   const savePage = async () => {
     if (!id) return;
 
     try {
-      const content = { items };
+      const content = { items: normalizeListItems(items) };
 
       if (!navigator.onLine) {
         await db.pages.put({
@@ -121,14 +116,14 @@ const List = () => {
         if (!navigator.onLine && localPage) {
           setTitle(localPage.title);
           setStarred(localPage.starred);
-          setItems(localPage.content.items || []);
+          setItems(normalizeListItems(localPage.content.items));
           return;
         }
 
         if (localPage && localPage.pendingSync) {
           setTitle(localPage.title);
           setStarred(localPage.starred);
-          setItems(localPage.content.items || []);
+          setItems(normalizeListItems(localPage.content.items));
           return;
         }
 
@@ -155,7 +150,7 @@ const List = () => {
 
         setTitle(page.title);
         setStarred(page.starred);
-        setItems(page.content.items || []);
+        setItems(normalizeListItems(page.content.items));
       } catch (error) {
         console.error(error);
       }
@@ -209,11 +204,7 @@ const List = () => {
       const newId = crypto.randomUUID();
       setItems((prev) => {
         const copy = [...prev];
-        copy.splice(index + 1, 0, {
-          id: newId,
-          text: "",
-          completed: false,
-        });
+        copy.splice(index + 1, 0, createListItem(newId));
         return copy;
       });
 
@@ -228,11 +219,7 @@ const List = () => {
 
     setItems((prev) => [
       ...prev,
-      {
-        id: newId,
-        text: "",
-        completed: false,
-      },
+      createListItem(newId),
     ]);
 
     setTimeout(() => {

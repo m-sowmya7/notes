@@ -11,12 +11,18 @@ import { useTemplatesModal } from "../context/TemplatesModalContext";
 import { type CardType } from "../types/kanbanTypes";
 import { DeleteZone } from "../components/kanban/DeleteZone";
 import { Column } from "../components/kanban/Column";
-
+import {
+  normalizeCards,
+  normalizeColumns,
+  type NormalizedColumn,
+} from "../utils/boardItems";
 const user = localStorage.getItem("userId") ?? "";
 
 const Kanban = () => {
   const [title, setTitle] = useState("");
   const [starred, setStarred] = useState(false);
+  // const [cards, setCards] = useState<CardType[]>([]);
+  const [columns, setColumns] = useState<NormalizedColumn[]>([]);
   const [cards, setCards] = useState<CardType[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -27,7 +33,7 @@ const Kanban = () => {
     if (!id) return;
 
     try {
-      const content = { cards };
+      const content = { columns, cards };
 
       if (!navigator.onLine) {
         await db.pages.put({
@@ -119,14 +125,18 @@ const Kanban = () => {
         if (!navigator.onLine && localPage) {
           setTitle(localPage.title);
           setStarred(localPage.starred);
-          setCards(localPage.content?.cards || []);
+          const cols = normalizeColumns(localPage.content?.columns);
+          setColumns(cols);
+          setCards(normalizeCards(localPage.content?.cards, cols));
           return;
         }
 
         if (localPage && localPage.pendingSync) {
           setTitle(localPage.title);
           setStarred(localPage.starred);
-          setCards(localPage.content.cards || []);
+          const cols = normalizeColumns(localPage.content?.columns);
+          setColumns(cols);
+          setCards(normalizeCards(localPage.content?.cards, cols));
           return;
         }
 
@@ -149,7 +159,15 @@ const Kanban = () => {
 
         setTitle(page.title);
         setStarred(page.starred);
-        setCards(page.content?.cards || []);
+        // setCards(page.content?.cards || []);
+        const cols = normalizeColumns(page.content?.columns);
+        const normalizedCards = normalizeCards(
+          page.content?.cards,
+          cols
+        );
+
+        setColumns(cols);
+        setCards(normalizedCards);
       }
       catch (error) {
         console.error("Failed to load page:", error);
@@ -166,7 +184,7 @@ const Kanban = () => {
     }, 1000);
 
     return () => clearTimeout(timeout);
-  }, [title, cards, id]);
+  }, [title, columns, cards, id]);
 
   useEffect(() => {
     const handleOnline = async () => {
@@ -220,14 +238,17 @@ const Kanban = () => {
         <DeleteZone setCards={setCards} />
 
         <div className="flex gap-2 overflow-x-auto pb-8">
-          <Column
-            title="Backlog"
-            column="backlog"
-            cards={cards}
-            setCards={setCards}
-          />
+          {columns.map((column) => (
+            <Column
+              key={column.id}
+              title={column.title}
+              column={column.id}
+              cards={cards}
+              setCards={setCards}
+            />
+          ))}
 
-          <Column
+          {/* <Column
             title="Todo"
             column="todo"
             cards={cards}
@@ -246,7 +267,7 @@ const Kanban = () => {
             column="done"
             cards={cards}
             setCards={setCards}
-          />
+          /> */}
         </div>
       </div>
     </div>
