@@ -15,33 +15,36 @@ interface Props {
 export default function SharedMarkdown({ content, editable, liveYdoc, onChange }: Props) {
   const seededLiveContent = useRef(false);
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-      }),
-      ...(liveYdoc
-        ? [
-            Collaboration.configure({
-              document: liveYdoc,
-            }),
-          ]
-        : []),
-      Placeholder.configure({
-        placeholder:
-          "Start Yapping and hit '/' for commands...",
-      }),
-      SlashCommand,
-    ],
-    content: liveYdoc ? undefined : content,
-    editable,
-    onUpdate: ({ editor }) => onChange(editor.getJSON()),
-    editorProps: {
-      attributes: {
-        class:
-          "prose prose-neutral max-w-none outline-none min-h-[500px]",
+  const editor = useEditor(
+    {
+      extensions: [
+        StarterKit.configure({
+          // history: !liveYdoc, // this is deprecated
+          undoRedo: false,
+        }),
+        ...(liveYdoc
+          ? [
+              Collaboration.configure({
+                document: liveYdoc,
+              }),
+            ]
+          : []),
+        Placeholder.configure({
+          placeholder: "Start Yapping and hit '/' for commands...",
+        }),
+        SlashCommand,
+      ],
+      content: liveYdoc ? undefined : content,
+      editable,
+      onUpdate: ({ editor }) => onChange(editor.getJSON()),
+      editorProps: {
+        attributes: {
+          class: "prose prose-neutral max-w-none outline-none min-h-[500px]",
+        },
       },
     },
-  }, [liveYdoc]);
+    [liveYdoc],
+  );
 
   useEffect(() => {
     if (!editor || !liveYdoc || seededLiveContent.current) return;

@@ -99,13 +99,16 @@ const PageToolbar = ({
 
   return (
     <>
-      <header className={`sticky top-0 z-50 flex items-center justify-between px-6 py-3 border-b border-neutral-200 transition-all
-    ${isModalOpen ? "bg-white/40 backdrop-blur-md" : "bg-white/90 backdrop-blur"}`}>
+      <header
+      className={`sticky top-0 z-50 flex items-center justify-between px-6 py-3 border-b border-neutral-200 transition-all
+    ${isModalOpen ? "bg-white/40 backdrop-blur-md" : "bg-white/90 backdrop-blur"}`}
+    >
         {/* Left */}
         <div className="flex items-center gap-2">
           <button
-            onClick={() => navigate('/pages')}
-            className="p-2 rounded-md hover:bg-neutral-100">
+            onClick={() => navigate("/pages")}
+            className="p-2 squircle-md hover:bg-neutral-100"
+        >
             <ArrowLeft size={18} />
           </button>
 
@@ -137,7 +140,10 @@ const PageToolbar = ({
             maxVisible={4}
           />
 
-          <button className="p-2 rounded-md hover:bg-neutral-100" onClick={() => setShareOpen(true)}>
+          <button
+          className="p-2 squircle-md hover:bg-neutral-100"
+          onClick={() => setShareOpen(true)}
+        >
             <Share2 size={18} />
           </button>
 
@@ -152,7 +158,8 @@ const PageToolbar = ({
 
           <button
             onClick={handleToggleStar}
-            className="p-2 rounded-md hover:bg-neutral-100">
+            className="p-2 squircle-md hover:bg-neutral-100"
+        >
             <Star
               size={18}
               className={`transition-all duration-200 ${isStarred ? "fill-yellow-400 text-yellow-400" : "text-black"}`}
@@ -162,7 +169,8 @@ const PageToolbar = ({
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setOpen(!open)}
-              className="p-2 rounded-md hover:bg-neutral-100">
+              className="p-2 squircle-md hover:bg-neutral-100"
+          >
               <MoreHorizontal size={18} />
             </button>
 
@@ -207,7 +215,8 @@ const PageToolbar = ({
                 <button
                   onClick={() => setShowDeleteModal(false)}
                   disabled={isDeleting}
-                  className="rounded-md border px-4 py-2 hover:bg-neutral-50">
+                  className="rounded-md border px-4 py-2 hover:bg-neutral-50"
+              >
                   Nah
                 </button>
 

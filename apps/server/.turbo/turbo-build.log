@@ -1,26 +1,0 @@
-[6n[?9001h[?1004h[m]0;C:\WINDOWS\system32\cmd.exe[?25h[?25l
-> server@1.0.0 build D:\my projects\notes\apps\server
-> tsc[5;1H[?25h[?25l[96msrc/repositories/shareRepository.ts[m:[93m89[m:[93m23 [m- [91merror [90mTS2339: [mProperty 'liveRoom' does not exist on type 'PrismaClient'.[7m[8;1H89[27m         return prisma.liveRoom.create({[7m
-  [27m[23X[91m[23C~~~~~~~~[11;1H[?25h[?25l[m[96msrc/repositories/shareRepository.ts[m:[93m95[m:[93m23 [m- [91merror [90mTS2339: [mProperty 'liveRoom' does not exist on type 'PrismaClient'.[7m[14;1H95[27m         return prisma.liveRoom.findUnique({[7m
-  [27m[23X[91m[23C~~~~~~~~[96m[17;1Hsrc/repositories/shareRepository.ts[m:[93m102[m:[93m23 [m- [91merror [90mTS2339: [mProperty 'liveRoom' does not exist on type 'PrismaClient'.[7m[20;1H102[27m         return prisma.liveRoom.findUnique({[7m
-   [27m[23X[91m[23C~~~~~~~~[96m[23;1Hsrc/repositories/shareRepository.ts[m:[93m109[m:[93m23 [m- [91merror [90mTS2339: [mProperty 'liveRoom' does not exist on type 'PrismaClient'.[7m[26;1H109[27m         return prisma.liveRoom.findFirst({[7m
-   [27m[23X[91m[23C~~~~~~~~
-[?25h[m
-[96msrc/repositories/shareRepository.ts[m:[93m115[m:[93m23 [m- [91merror [90mTS2339: [m
-[90m[27;59H [mProperty 'liveRoom' does not exist on type 'PrismaClient'. [28;1H
-
-[7m115[27m         return prisma.liveRoom.findFirst({[K
-[7m   [27m[23X[91m[23C~~~~~~~~[K[m
-
-[96msrc/repositories/shareRepository.ts[m:[93m121[m:[93m23 [m- [91merror [90mTS2339: [m
-[90m[27;59H [mProperty 'liveRoom' does not exist on type 'PrismaClient'. [28;1H
-
-[7m121[27m         return prisma.liveRoom.update({[K
-[7m   [27m[23X[91m[23C~~~~~~~~[K[m
-
-
-Found 6 errors in the same file, starting at: src/repositor
-[27;59Hries/shareRepository.ts[90m:89[K[m
-
-[30m[41m ELIFECYCLE [m [31mCommand failed with exit code 2.[m
-[?9001l[?1004l

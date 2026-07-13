@@ -12,6 +12,7 @@
   "dependencies": {
     "@hocuspocus/provider": "^4.3.0",
     "@hocuspocus/provider-react": "^4.3.0",
+    "@notes/ui": "workspace:*",
     "@tiptap/core": "^3.26.1",
     "@tiptap/extension-blockquote": "^3.26.1",
     "@tiptap/extension-collaboration": "^3.26.0",

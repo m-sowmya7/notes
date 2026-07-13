@@ -95,7 +95,7 @@ export default function ManageLinksModal({
 
     return (
         <div className="fixed inset-0 z-999 flex items-center justify-center bg-black/30">
-            <div className="w-[650px] rounded-2xl bg-white shadow-xl">
+            <div className="w-[650px] squircle-2xl bg-white shadow-xl">
                 <div className="flex items-center justify-between border-b px-6 py-4">
                     <h2 className="text-lg font-semibold">
                         Shared Links
@@ -120,32 +120,43 @@ export default function ManageLinksModal({
                             const url = `${window.location.origin}/share/${link.token}`;
 
                             return (
-                                <div key={link.id} className="flex items-center justify-between border-b px-6 py-4">
-                                    <div className="flex-1">
-                                        <div className="font-medium">
-                                            {link.access}
-                                        </div>
+                              <div
+                                key={link.id}
+                                className="flex items-center justify-between border-b px-6 py-4"
+                              >
+                                <div className="flex-1">
+                                  <div className="font-medium">
+                                    {link.access}
+                                  </div>
 
-                                        <div className="mt-1 truncate text-sm text-neutral-500">
-                                            {url}
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-2">
-                                        <button onClick={() => copyLink(link.id, url)} className="rounded-lg p-2 transition hover:bg-neutral-100">
-                                            {copiedId === link.id ? (
-                                                <Check size={18} className="text-green-600"
-                                                />
-                                            ) : (
-                                                <Copy size={16} />
-                                            )}
-                                        </button>
-
-                                        <button onClick={() => deleteLink(link.id)} className="rounded-lg p-2 text-red-500 hover:bg-red-50">
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
+                                  <div className="mt-1 truncate text-sm text-neutral-500">
+                                    {url}
+                                  </div>
                                 </div>
+
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => copyLink(link.id, url)}
+                                    className="squircle-lg p-2 transition hover:bg-neutral-100"
+                                  >
+                                    {copiedId === link.id ? (
+                                      <Check
+                                        size={18}
+                                        className="text-green-600"
+                                      />
+                                    ) : (
+                                      <Copy size={16} />
+                                    )}
+                                  </button>
+
+                                  <button
+                                    onClick={() => deleteLink(link.id)}
+                                    className="squircle-lg p-2 text-red-500 hover:bg-red-50"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                </div>
+                              </div>
                             );
                         })
                     )}

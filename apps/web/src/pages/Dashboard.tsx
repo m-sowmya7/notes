@@ -7,13 +7,12 @@ import ShareModal from "../components/ShareModal";
 import { getFolderColor, formatEditedTime, SORT_LABELS, type SortOption } from "../utils/dashboard/helpers";
 import { FolderIcon } from "../components/dashboard/FolderIcon";
 import { apiBaseUrl } from "../utils/runtimeConfig";
-
+import { Button, Dropdown, DropdownTrigger, DropdownContent, DropdownItem } from "@notes/ui";
 
 const DashboardPage = () => {
   const [pages, setPages] = useState<Page[]>([]);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("recent");
-  const [showSortMenu, setShowSortMenu] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [showLinksModal, setShowLinksModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
@@ -71,15 +70,6 @@ const DashboardPage = () => {
     }
   };
 
-  useEffect(() => {
-    const closeMenus = () => {
-      setActiveMenu(null);
-      setShowSortMenu(false);
-    };
-    document.addEventListener("click", closeMenus);
-    return () => document.removeEventListener("click", closeMenus);
-  }, []);
-
   const filteredPages = pages.filter((page) =>
     page.title.toLowerCase().includes(search.toLowerCase())
   );
@@ -111,7 +101,7 @@ const DashboardPage = () => {
         <h1 className="text-5xl font-black text-[#1f1f1f]">All Pages</h1>
 
         <div className="mt-8 flex items-center justify-between">
-          <div className="flex w-85 items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3">
+          <div className="flex w-85 items-center gap-3 squircle-xl border border-neutral-200 bg-white px-4 py-3">
             <Search size={18} className="text-neutral-400" />
             <input
               type="text"
@@ -122,32 +112,36 @@ const DashboardPage = () => {
             />
           </div>
 
-          <div className="relative" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={() => setShowSortMenu((v) => !v)}
-              className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm">
-              {SORT_LABELS[sortBy]}
-              <ChevronDown size={16} />
-            </button>
+          <Dropdown>
+            <DropdownTrigger asChild>
+              <Button
+                variant="outline"
+                className="gap-2 !bg-white !border-border"
+              >
+                {SORT_LABELS[sortBy]}
+                <ChevronDown size={16} />
+              </Button>
+            </DropdownTrigger>
 
-            {showSortMenu && (
-              <div className="absolute right-0 top-12 z-50 w-48 rounded-xl border border-neutral-200 bg-white shadow-lg">
-                {(Object.entries(SORT_LABELS) as [SortOption, string][]).map(
-                  ([key, label]) => (
-                    <button
-                      key={key}
-                      onClick={() => {
-                        setSortBy(key);
-                        setShowSortMenu(false);
-                      }}
-                      className={`flex w-full items-center px-4 py-3 text-sm hover:bg-neutral-50 ${sortBy === key ? "font-semibold" : ""}`}>
-                      {label}
-                    </button>
-                  )
-                )}
-              </div>
-            )}
-          </div>
+            <DropdownContent
+              alignOffset={-48}
+              align="end"
+              side="bottom"
+              className="w-48"
+            >
+              {(Object.entries(SORT_LABELS) as [SortOption, string][]).map(
+                ([key, label]) => (
+                  <DropdownItem
+                    key={key}
+                    onClick={() => setSortBy(key)}
+                    className={sortBy === key ? "font-semibold" : ""}
+                  >
+                    {label}
+                  </DropdownItem>
+                ),
+              )}
+            </DropdownContent>
+          </Dropdown>
         </div>
 
         <div className="mt-8 rounded-2xl border border-neutral-200 bg-white">
@@ -160,8 +154,12 @@ const DashboardPage = () => {
               <div
                 key={page.id}
                 onClick={() => navigate(`/editor/${page.type}/${page.id}`)}
-                className={`flex w-full cursor-pointer items-center justify-between px-6 py-5 transition hover:bg-neutral-50 ${index !== sortedPages.length - 1
-                  ? "border-b border-neutral-100" : ""}`}>
+                className={`flex w-full cursor-pointer items-center justify-between px-6 py-5 transition hover:bg-neutral-50 ${
+                  index !== sortedPages.length - 1
+                    ? "border-b border-neutral-100"
+                    : ""
+                }`}
+              >
                 <div className="flex items-center gap-5">
                   <FolderIcon color={getFolderColor(page.type)} />
                   <div>
@@ -174,24 +172,28 @@ const DashboardPage = () => {
 
                 <div className="relative">
                   <div className="flex items-center gap-3">
-                    {page.starred && <Star size={16} className="fill-yellow-400 text-yellow-400" />}
+                    {page.starred && (
+                      <Star
+                        size={16}
+                        className="fill-yellow-400 text-yellow-400"
+                      />
+                    )}
 
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setActiveMenu(activeMenu === page.id ? null : page.id);
-                      }}>
-                      <MoreHorizontal
-                        size={20}
-                        className="text-neutral-500"
-                      />
+                      }}
+                    >
+                      <MoreHorizontal size={20} className="text-neutral-500" />
                     </button>
                   </div>
 
                   {activeMenu === page.id && (
                     <div
                       onClick={(e) => e.stopPropagation()}
-                      className="absolute right-0 top-8 z-50 w-52 rounded-xl border border-neutral-200 bg-white shadow-lg">
+                      className="absolute right-0 top-8 z-50 w-52 rounded-xl border border-neutral-200 bg-white shadow-lg"
+                    >
                       <button
                         onClick={() => {
                           setSelectedPageId(page.id);
@@ -199,7 +201,8 @@ const DashboardPage = () => {
                           setShowShareModal(true);
                           setActiveMenu(null);
                         }}
-                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50">
+                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50"
+                      >
                         <Share2 size={16} />
                         Share
                       </button>
@@ -210,7 +213,8 @@ const DashboardPage = () => {
                           setShowLinksModal(true);
                           setActiveMenu(null);
                         }}
-                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50">
+                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50"
+                      >
                         <Link2 size={16} />
                         Manage Links
                       </button>
@@ -220,7 +224,8 @@ const DashboardPage = () => {
                           toggleFavorite(page.id);
                           setActiveMenu(null);
                         }}
-                        className="flex w-full items-center gap-2 px-4 py-3 text-sm text-yellow-600 hover:bg-neutral-50">
+                        className="flex w-full items-center gap-2 px-4 py-3 text-sm text-yellow-600 hover:bg-neutral-50"
+                      >
                         <Star size={16} />
                         {page.starred ? "Unfavorite" : "Favorite"}
                       </button>

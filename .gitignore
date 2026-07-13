@@ -3,3 +3,8 @@ dist
 .env
 coverage
 .DS_Store
+.impeccable
+.github
+.gemini
+.pnpm-store
+.turbo
