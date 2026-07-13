@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { getFolderColor, formatEditedTime } from "../utils/dashboard/helpers";
 import { type Page } from "../types/pageType";
 import { FolderIcon } from "../components/dashboard/FolderIcon";
+import { apiBaseUrl } from "../utils/runtimeConfig";
 
 const StarredPage = () => {
   const navigate = useNavigate();
@@ -16,8 +17,7 @@ const StarredPage = () => {
   useEffect(() => {
     const loadStarredPages = async () => {
       try {
-        const res = await fetch(
-          "http://localhost:5000/api/pages/starred", {
+        const res = await fetch(`${apiBaseUrl}/pages/starred`, {
             headers: {
               "x-user-id": user || "",
             }
@@ -66,7 +66,7 @@ const StarredPage = () => {
       );
 
       await fetch(
-        `http://localhost:5000/api/pages/${pageId}/star`,
+        `${apiBaseUrl}/pages/${pageId}/star`,
         {
           method: "PATCH",
           headers: {

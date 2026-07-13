@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Home, Folder, Star, Trash2, Plus, ChevronDown, NotebookPen } from 'lucide-react'
+import { Home, Folder, Star, Trash2, Plus, NotebookPen } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import TemplatesModal from './TemplatesModal'
 import { useTemplatesModal } from '../context/TemplatesModalContext'

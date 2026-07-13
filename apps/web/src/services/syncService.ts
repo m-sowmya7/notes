@@ -1,4 +1,5 @@
 import { db } from "../db/localDb";
+import { apiBaseUrl } from "../utils/runtimeConfig";
 
 export const syncPendingPages = async () => {
    try {
@@ -7,8 +8,7 @@ export const syncPendingPages = async () => {
         .toArray();
 
       for (const page of pending) {
-        const res = await fetch(
-          `http://localhost:5000/api/pages/${page.id}`,
+        const res = await fetch(`${apiBaseUrl}/pages/${page.id}`,
           {
             method: "PUT",
             // does the userId need to be passed here???

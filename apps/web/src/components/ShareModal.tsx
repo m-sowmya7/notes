@@ -1,6 +1,7 @@
 import { X, Copy, Eye, Pencil, Check, Radio } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { apiBaseUrl } from "../utils/runtimeConfig";
 
 type AccessLevel = "view" | "comment" | "edit" | "live";
 
@@ -9,7 +10,6 @@ type ShareModalProps = {
   onClose: () => void;
   title: string;
   pageId: string;
-  onLiveStart?: () => void;
 };
 
 const options = [
@@ -43,19 +43,18 @@ const options = [
   }
 ];
 
-const ShareModal = ({ open, onClose, title, pageId, onLiveStart }: ShareModalProps) => {
+const ShareModal = ({ open, onClose, title, pageId }: ShareModalProps) => {
   const [access, setAccess] = useState<AccessLevel | null>(null);
   const [copied, setCopied] = useState(false);
   const [shareLink, setShareLink] = useState("");
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
-  const [isLiveStarting, setIsLiveStarting] = useState(false);
   const generateShareLink = async (accessLevel: AccessLevel) => {
     if (!pageId) return;
 
     try {
       setIsGeneratingLink(true);
 
-      const res = await fetch(`http://localhost:5000/api/share-links/${pageId}`, {
+      const res = await fetch(`${apiBaseUrl}/share-links/${pageId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -83,7 +82,7 @@ const ShareModal = ({ open, onClose, title, pageId, onLiveStart }: ShareModalPro
   useEffect(() => {
     if (!open || !access) return;
     generateShareLink(access);
-  }, [open, access]);
+  }, [open, access, pageId]);
 
   useEffect(() => {
     if (!open) {

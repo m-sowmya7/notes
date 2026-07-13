@@ -5,5 +5,4 @@ export type PageToolbarProps = {
   isOnline: boolean;
   isSyncing: boolean;
   isModalOpen?: boolean;
-  onLiveStart?: () => void;
 };

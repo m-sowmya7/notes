@@ -18,7 +18,6 @@ export default function SharedMarkdown({ content, editable, liveYdoc, onChange }
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        history: !liveYdoc,
       }),
       ...(liveYdoc
         ? [

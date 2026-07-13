@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { useEffect } from 'react'
+import { apiBaseUrl } from '../utils/runtimeConfig'
 const AppLayout = () => {
 
   useEffect(() => {
@@ -11,7 +12,7 @@ const AppLayout = () => {
         localStorage.setItem("userId", userId);
       }
       // Ensure user exists in the DB
-      const res = await fetch("http://localhost:5000/api/users/user", {
+      const res = await fetch(`${apiBaseUrl}/users/user`, {
         headers: { "x-user-id": userId },
       });
       if (!res.ok) {

@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import SharedMarkdown from "../features/share/components/SharedMarkdown";
 import SharedList, { type ListContent } from "../features/share/components/SharedList";
 import SharedKanban, { type KanbanContent } from "../features/share/components/SharedKanban";
+import { apiBaseUrl } from "../utils/runtimeConfig";
 
 type PageType = "MARKDOWN" | "LIST" | "KANBAN";
 
@@ -36,7 +37,7 @@ export default function SharedPage() {
     }
 
     const controller = new AbortController();
-    fetch(`http://localhost:5000/api/share-links/token/${token}`, { signal: controller.signal })
+    fetch(`${apiBaseUrl}/share-links/token/${token}`, { signal: controller.signal })
       .then(async (res) => {
         if (!res.ok) throw new Error("This share link is invalid or has expired.");
         return res.json() as Promise<SharedResponse>;
@@ -55,7 +56,7 @@ export default function SharedPage() {
     if (!token || data?.access !== "EDIT") return;
     setSaveState("saving");
     try {
-      const res = await fetch(`http://localhost:5000/api/share-links/token/${token}`, {
+      const res = await fetch(`${apiBaseUrl}/share-links/token/${token}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(changes),
