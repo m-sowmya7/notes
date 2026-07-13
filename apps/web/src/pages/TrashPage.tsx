@@ -25,45 +25,6 @@
 // ];
 
 const TrashPage = () => {
-  // return (
-  {/* <h1 className="text-5xl font-black text-[#1f1f1f] mb-6">
-        Trash
-      </h1>
-
-      <div className="bg-amber-50 border border-amber-300 text-amber-700 rounded-lg p-3 mb-5">
-        Pages in trash will be permanently deleted in
-        30 days.
-      </div>
-
-      <div className="bg-white border rounded-xl overflow-hidden">
-        {deletedPages.map((page) => (
-          <div
-            key={page.id}
-            className="flex items-center justify-between p-4 border-b last:border-none">
-            <div>
-              <h3 className="font-medium">
-                {page.title}
-              </h3>
-
-              <p className="text-sm text-gray-500">
-                Deleted {page.deletedAt}
-              </p>
-            </div>
-
-            <div className="flex gap-3">
-              <button className="p-2 rounded hover:bg-gray-100">
-                <RotateCcw size={18} />
-              </button>
-
-              <button className="p-2 rounded hover:bg-red-100 text-red-500">
-                <Trash2 size={18} />
-              </button>
-            </div>
-          </div>
-        ))}
-      </div> */}
-  // );
-
   return (
     <main className="flex min-h-screen bg-[#f6f3ef]">
       <section className="flex-1 px-12 py-10">
@@ -72,12 +33,9 @@ const TrashPage = () => {
             Trash
           </h1>
         </div>
-
-
-        <div className="mt-8 ">
+        <div className="mt-8">
           Be Right Back! This page is under construction...
         </div>
-
       </section>
     </main>
   )

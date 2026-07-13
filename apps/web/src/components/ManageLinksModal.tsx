@@ -1,5 +1,6 @@
 import { X, Trash2, Copy, Check } from "lucide-react";
 import { useEffect, useState } from "react";
+import { apiBaseUrl } from "../utils/runtimeConfig";
 
 type ShareLink = {
     id: string;
@@ -50,9 +51,7 @@ export default function ManageLinksModal({
             try {
                 setLoading(true);
 
-                const res = await fetch(
-                    `http://localhost:5000/api/share-links/page/${pageId}`
-                );
+                const res = await fetch(`${apiBaseUrl}/share-links/page/${pageId}`);
 
                 if (!res.ok) {
                     throw new Error(`HTTP ${res.status}`);
@@ -76,12 +75,9 @@ export default function ManageLinksModal({
 
     const deleteLink = async (id: string) => {
         try {
-            const res = await fetch(
-                `http://localhost:5000/api/share-links/${id}`,
-                {
-                    method: "DELETE",
-                }
-            );
+            const res = await fetch(`${apiBaseUrl}/share-links/${id}`, {
+                method: "DELETE",
+            });
 
             if (!res.ok) {
                 throw new Error(await res.text());

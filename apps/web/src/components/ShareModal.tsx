@@ -1,6 +1,7 @@
 import { Copy, Eye, Pencil, Check, Radio } from "lucide-react";
 import { Modal } from "@notes/ui";
 import { useEffect, useState } from "react";
+import { apiBaseUrl } from "../utils/runtimeConfig";
 
 type AccessLevel = "view" | "comment" | "edit" | "live";
 
@@ -9,7 +10,6 @@ type ShareModalProps = {
   onClose: () => void;
   title: string;
   pageId: string;
-  onLiveStart?: () => void;
 };
 
 const options = [
@@ -43,7 +43,12 @@ const options = [
   },
 ];
 
-const ShareModal = ({ open, onClose, title, pageId, onLiveStart }: ShareModalProps) => {
+const ShareModal = ({
+  open,
+  onClose,
+  title,
+  pageId,
+}: ShareModalProps) => {
   const [access, setAccess] = useState<AccessLevel | null>(null);
   const [copied, setCopied] = useState(false);
   const [shareLink, setShareLink] = useState("");
@@ -55,18 +60,15 @@ const ShareModal = ({ open, onClose, title, pageId, onLiveStart }: ShareModalPro
     try {
       setIsGeneratingLink(true);
 
-      const res = await fetch(
-        `http://localhost:5000/api/share-links/${pageId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            access: accessLevel === "view" ? "VIEW" : "EDIT",
-          }),
+      const res = await fetch(`${apiBaseUrl}/share-links/${pageId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          access: accessLevel === "view" ? "VIEW" : "EDIT",
+        }),
+      });
 
       if (!res.ok) {
         throw new Error("Failed to generate share link");
@@ -82,10 +84,9 @@ const ShareModal = ({ open, onClose, title, pageId, onLiveStart }: ShareModalPro
   };
 
   useEffect(() => {
-    console.log("Temparory:", onLiveStart);
     if (!open || !access) return;
     generateShareLink(access);
-  }, [open, access]);
+  }, [open, access, pageId]);
 
   useEffect(() => {
     if (!open) {

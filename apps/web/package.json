@@ -24,6 +24,7 @@
     "@tiptap/starter-kit": "^3.26.0",
     "@tiptap/suggestion": "^3.26.1",
     "dexie": "^4.4.3",
+    "dotenv": "^17.4.2",
     "lucide-react": "^1.17.0",
     "motion": "^12.40.0",
     "react": "^19.2.6",

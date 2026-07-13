@@ -16,6 +16,7 @@ import {
   normalizeColumns,
   type NormalizedColumn,
 } from "../utils/boardItems";
+import { apiBaseUrl } from "../utils/runtimeConfig";
 const user = localStorage.getItem("userId") ?? "";
 
 const Kanban = () => {
@@ -49,7 +50,7 @@ const Kanban = () => {
       }
 
       const res = await fetch(
-        `http://localhost:5000/api/pages/${id}`,
+        `${apiBaseUrl}/pages/${id}`,
         {
           method: "PUT",
           headers: {
@@ -88,7 +89,7 @@ const Kanban = () => {
 
       for (const page of pending) {
         const res = await fetch(
-          `http://localhost:5000/api/pages/${page.id}`,
+          `${apiBaseUrl}/pages/${page.id}`,
           {
             method: "PUT",
             headers: {
@@ -140,7 +141,7 @@ const Kanban = () => {
           return;
         }
 
-        const res = await fetch(`http://localhost:5000/api/pages/${id}`, {
+        const res = await fetch(`${apiBaseUrl}/pages/${id}`, {
           headers: {
             "x-user-id": user || "",
           }

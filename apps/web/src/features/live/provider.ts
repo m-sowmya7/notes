@@ -1,5 +1,6 @@
 import { HocuspocusProvider } from '@hocuspocus/provider';
 import * as Y from 'yjs';
+import { liveWebSocketUrl } from '../../utils/runtimeConfig';
 
 export type LiveProvider = {
     provider: HocuspocusProvider;
@@ -11,7 +12,7 @@ export function createLiveProvider(pageId: string) : LiveProvider {
 
 
     const provider = new HocuspocusProvider({
-        url: "ws://localhost:1234",
+        url: liveWebSocketUrl,
         name: pageId,
         document: ydoc,
     });

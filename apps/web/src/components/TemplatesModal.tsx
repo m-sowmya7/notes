@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { apiBaseUrl } from "../utils/runtimeConfig";
 
 type TemplatesModalProps = {
   open: boolean;
@@ -155,9 +156,7 @@ const TemplatesModal = ({ open, onClose }: TemplatesModalProps) => {
       }
 
       const user = localStorage.getItem("userId");
-      const res = await fetch(
-        "http://localhost:5000/api/pages",
-        {
+      const res = await fetch(`${apiBaseUrl}/pages`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

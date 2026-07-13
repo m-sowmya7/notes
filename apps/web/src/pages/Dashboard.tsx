@@ -1,5 +1,3 @@
-// Tasks : 
-// 1. share option in the options has to work
 import { MoreHorizontal, Search, ChevronDown, Star, Share2, Link2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +6,7 @@ import ManageLinksModal from "../components/ManageLinksModal";
 import ShareModal from "../components/ShareModal";
 import { getFolderColor, formatEditedTime, SORT_LABELS, type SortOption } from "../utils/dashboard/helpers";
 import { FolderIcon } from "../components/dashboard/FolderIcon";
+import { apiBaseUrl } from "../utils/runtimeConfig";
 import { Button, Dropdown, DropdownTrigger, DropdownContent, DropdownItem } from "@notes/ui";
 
 const DashboardPage = () => {
@@ -26,7 +25,7 @@ const DashboardPage = () => {
       try {
         const user = localStorage.getItem("userId");
         if (!user) throw new Error("User not found in localStorage");
-        const res = await fetch("http://localhost:5000/api/pages", {
+        const res = await fetch(`${apiBaseUrl}/pages`, {
           headers: {
             "x-user-id": user || "",
           }
@@ -55,7 +54,7 @@ const DashboardPage = () => {
 
     try {
       const user = localStorage.getItem("userId");
-      await fetch(`http://localhost:5000/api/pages/${pageId}/star`, {
+      await fetch(`${apiBaseUrl}/pages/${pageId}/star`, {
         method: "PATCH",
         headers: {
           "x-user-id": user || "",

@@ -9,6 +9,7 @@ import {
   normalizeListItems,
   type NormalizedListItem,
 } from "../utils/listItems";
+import { apiBaseUrl } from "../utils/runtimeConfig";
 
 type ListItem = NormalizedListItem;
 
@@ -43,7 +44,7 @@ const List = () => {
         return;
       }
 
-      const res = await fetch(`http://localhost:5000/api/pages/${id}`,
+      const res = await fetch(`${apiBaseUrl}/pages/${id}`,
         {
           method: "PUT",
           headers: {
@@ -81,7 +82,7 @@ const List = () => {
         .toArray();
 
       for (const page of pending) {
-        const res = await fetch(`http://localhost:5000/api/pages/${page.id}`,
+        const res = await fetch(`${apiBaseUrl}/pages/${page.id}`,
           {
             method: "PUT",
             headers: {
@@ -127,7 +128,7 @@ const List = () => {
           return;
         }
 
-        const res = await fetch(`http://localhost:5000/api/pages/${id}`,
+        const res = await fetch(`${apiBaseUrl}/pages/${id}`,
           {
             headers: {
               "x-user-id": user,

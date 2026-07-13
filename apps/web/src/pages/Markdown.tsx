@@ -8,6 +8,7 @@ import { SlashCommand } from "../features/editor/extensions/SlashCommand";
 import PageToolbar from "../components/PageToolbar";
 import { useTemplatesModal } from "../context/TemplatesModalContext";
 import { syncPendingPages } from "../services/syncService";
+import { apiBaseUrl } from "../utils/runtimeConfig";
 
 const user = localStorage.getItem("userId") ?? "";
 
@@ -54,7 +55,7 @@ const Markdown = () => {
         return;
       }
 
-      const res = await fetch(`http://localhost:5000/api/pages/${id}`,
+      const res = await fetch(`${apiBaseUrl}/pages/${id}`,
         {
           method: "PUT",
           headers: {
@@ -100,7 +101,7 @@ const Markdown = () => {
           return;
         }
 
-        const res = await fetch(`http://localhost:5000/api/pages/${id}`, {
+        const res = await fetch(`${apiBaseUrl}/pages/${id}`, {
           method: "GET",
           headers: {
             "x-user-id": user || "",
