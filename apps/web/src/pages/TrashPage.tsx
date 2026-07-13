@@ -1,28 +1,28 @@
-import { RotateCcw, Trash2 } from "lucide-react";
+// import { RotateCcw, Trash2 } from "lucide-react";
 
-type DeletedPage = {
-  id: string;
-  title: string;
-  deletedAt: string;
-};
+// type DeletedPage = {
+//   id: string;
+//   title: string;
+//   deletedAt: string;
+// };
 
-const deletedPages: DeletedPage[] = [
-  {
-    id: "1",
-    title: "Old Project Ideas",
-    deletedAt: "2 days ago",
-  },
-  {
-    id: "2",
-    title: "Archive 2024",
-    deletedAt: "1 week ago",
-  },
-  {
-    id: "3",
-    title: "Unused Notes",
-    deletedAt: "2 weeks ago",
-  },
-];
+// const deletedPages: DeletedPage[] = [
+//   {
+//     id: "1",
+//     title: "Old Project Ideas",
+//     deletedAt: "2 days ago",
+//   },
+//   {
+//     id: "2",
+//     title: "Archive 2024",
+//     deletedAt: "1 week ago",
+//   },
+//   {
+//     id: "3",
+//     title: "Unused Notes",
+//     deletedAt: "2 weeks ago",
+//   },
+// ];
 
 const TrashPage = () => {
   // return (

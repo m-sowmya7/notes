@@ -7,6 +7,6 @@
     "strict": true,
     "esModuleInterop": true
   },
-  "include": ["src/**/*.ts", "prisma/client.ts"],
+  "include": ["src/**/*.ts", "src/prisma/client.ts"],
   "exclude": ["prisma.config.ts", "prisma/**"]
 }

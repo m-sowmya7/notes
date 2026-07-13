@@ -7,3 +7,4 @@ coverage
 .github
 .gemini
 .pnpm-store
+.turbo

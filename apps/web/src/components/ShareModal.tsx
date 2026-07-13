@@ -1,4 +1,4 @@
-import { X, Copy, Eye, Pencil, Check, Radio } from "lucide-react";
+import { Copy, Eye, Pencil, Check, Radio } from "lucide-react";
 import { Modal } from "@notes/ui";
 import { useEffect, useState } from "react";
 
@@ -48,7 +48,7 @@ const ShareModal = ({ open, onClose, title, pageId, onLiveStart }: ShareModalPro
   const [copied, setCopied] = useState(false);
   const [shareLink, setShareLink] = useState("");
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
-  const [isLiveStarting, setIsLiveStarting] = useState(false);
+  // const [isLiveStarting, setIsLiveStarting] = useState(false);
   const generateShareLink = async (accessLevel: AccessLevel) => {
     if (!pageId) return;
 
@@ -82,6 +82,7 @@ const ShareModal = ({ open, onClose, title, pageId, onLiveStart }: ShareModalPro
   };
 
   useEffect(() => {
+    console.log("Temparory:", onLiveStart);
     if (!open || !access) return;
     generateShareLink(access);
   }, [open, access]);

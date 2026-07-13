@@ -36,11 +36,6 @@ function useDropdownContext() {
   return ctx;
 }
 
-function useDropdown() {
-  const { open, setOpen } = useDropdownContext();
-  return { open, setOpen };
-}
-
 type MenuPositionInput = {
   triggerRect: DOMRect;
   menuWidth: number;
