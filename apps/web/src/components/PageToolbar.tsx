@@ -13,6 +13,7 @@ const PageToolbar = ({
   isOnline,
   isSyncing,
   isModalOpen,
+  onLiveStart,
 }: PageToolbarProps) => {
   const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -179,6 +180,7 @@ const PageToolbar = ({
         pageId={pageId}
         onClose={() => setShareOpen(false)}
         title={title}
+        onLiveStart={onLiveStart}
       />
       {showDeleteModal && (
         <div className="fixed inset-0 z-100 m-75 flex items-center justify-center bg-black/40">

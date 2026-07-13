@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
+import * as Y from "yjs";
+import {
+  createListItem,
+  normalizeListItems,
+  type NormalizedListItem,
+} from "../../../utils/listItems";
 
-interface Item {
-  id: string;
-  text: string;
-  completed: boolean;
-}
+type Item = NormalizedListItem;
 
 export interface ListContent {
   items: Item[];
@@ -14,22 +16,68 @@ export interface ListContent {
 interface Props {
   content: ListContent;
   editable: boolean;
+  liveYdoc?: Y.Doc;
   onChange: (content: ListContent) => void;
 }
 
 export default function SharedList({
   content,
   editable,
+  liveYdoc,
   onChange,
 }: Props) {
-  const [items, setItems] = useState(content?.items || []);
+  const [items, setItems] = useState<Item[]>(normalizeListItems(content?.items));
 
-  useEffect(() => setItems(content?.items || []), [content]);
+  useEffect(() => {
+    if (!liveYdoc) return;
+
+    const yItems = liveYdoc.getArray<Item>("items");
+
+    if (yItems.length === 0 && content?.items?.length) {
+      yItems.insert(0, normalizeListItems(content.items));
+    }
+
+    const syncItems = () => {
+      const raw = yItems.toArray();
+      const next = normalizeListItems(raw);
+
+      if (JSON.stringify(raw) !== JSON.stringify(next)) {
+        liveYdoc.transact(() => {
+          yItems.delete(0, yItems.length);
+          yItems.insert(0, next);
+        });
+        return;
+      }
+
+      setItems(next);
+
+      if (editable) {
+        onChange({ items: next });
+      }
+    };
+
+    syncItems();
+    yItems.observe(syncItems);
+
+    return () => yItems.unobserve(syncItems);
+  }, [content?.items, editable, liveYdoc, onChange]);
 
   const updateItems = (next: Item[]) => {
     if (!editable) return;
-    setItems(next);
-    onChange({ items: next });
+
+    const normalized = normalizeListItems(next);
+
+    if (liveYdoc) {
+      const yItems = liveYdoc.getArray<Item>("items");
+      liveYdoc.transact(() => {
+        yItems.delete(0, yItems.length);
+        yItems.insert(0, normalized);
+      });
+      return;
+    }
+
+    setItems(normalized);
+    onChange({ items: normalized });
   };
 
   const toggleItem = (id: string) => {
@@ -72,7 +120,7 @@ export default function SharedList({
           {editable && <button aria-label="Delete item" onClick={() => updateItems(items.filter((value) => value.id !== item.id))} className="hover:text-red-500"><Trash2 size={16} /></button>}
         </div>
       ))}
-      {editable && <button onClick={() => updateItems([...items, { id: crypto.randomUUID(), text: "", completed: false }])} className="flex items-center gap-2 text-sm text-neutral-500"><Plus size={16} /> Add item</button>}
+      {editable && <button onClick={() => updateItems([...items, createListItem()])} className="flex items-center gap-2 text-sm text-neutral-500"><Plus size={16} /> Add item</button>}
     </div>
   );
 }

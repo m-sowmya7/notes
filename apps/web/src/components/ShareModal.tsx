@@ -2,13 +2,14 @@ import { X, Copy, Eye, Pencil, Check, Radio } from "lucide-react";
 import { Modal } from "@notes/ui";
 import { useEffect, useState } from "react";
 
-type AccessLevel = "view" | "comment" | "edit";
+type AccessLevel = "view" | "comment" | "edit" | "live";
 
 type ShareModalProps = {
   open: boolean;
   onClose: () => void;
   title: string;
   pageId: string;
+  onLiveStart?: () => void;
 };
 
 const options = [
@@ -42,11 +43,12 @@ const options = [
   },
 ];
 
-const ShareModal = ({ open, onClose, title, pageId }: ShareModalProps) => {
+const ShareModal = ({ open, onClose, title, pageId, onLiveStart }: ShareModalProps) => {
   const [access, setAccess] = useState<AccessLevel | null>(null);
   const [copied, setCopied] = useState(false);
   const [shareLink, setShareLink] = useState("");
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
+  const [isLiveStarting, setIsLiveStarting] = useState(false);
   const generateShareLink = async (accessLevel: AccessLevel) => {
     if (!pageId) return;
 
