@@ -230,3 +230,134 @@ packages/
   shared-types/
   ui/
 ```
+
+```
+├── .turbo/
+│   └── preferences/
+│       └── tui.json
+├── apps/
+│   ├── server/
+│   │   ├── prisma/
+│   │   │   ├── migrations/
+│   │   │   │   ├── 20260621153416_init/
+│   │   │   │   │   └── migration.sql
+│   │   │   │   ├── 20260621153632_add_share_link/
+│   │   │   │   │   └── migration.sql
+│   │   │   │   ├── 20260705104212_live_rooms/
+│   │   │   │   │   └── migration.sql
+│   │   │   │   └── migration_lock.toml
+│   │   │   ├── client.ts
+│   │   │   └── schema.prisma
+│   │   ├── src/
+│   │   │   ├── controllers/
+│   │   │   │   ├── documentController.ts
+│   │   │   │   ├── shareController.ts
+│   │   │   │   └── userController.ts
+│   │   │   ├── live/
+│   │   │   │   ├── extensions/
+│   │   │   │   │   ├── awareness.ts
+│   │   │   │   │   └── persistence.ts
+│   │   │   │   ├── providers/
+│   │   │   │   │   └── provider.ts
+│   │   │   │   ├── hocuspocus.ts
+│   │   │   │   ├── rooms.ts
+│   │   │   │   └── utils.ts
+│   │   │   ├── repositories/
+│   │   │   │   ├── documentRepository.ts
+│   │   │   │   ├── shareRepository.ts
+│   │   │   │   └── userRepository.ts
+│   │   │   ├── routes/
+│   │   │   │   ├── documentRoutes.ts
+│   │   │   │   ├── shareRoutes.ts
+│   │   │   │   └── userRoutes.ts
+│   │   │   ├── services/
+│   │   │   │   ├── documentService.ts
+│   │   │   │   ├── shareService.ts
+│   │   │   │   └── userService.ts
+│   │   │   └── index.ts
+│   │   ├── .env.example
+│   │   ├── .gitignore
+│   │   ├── package.json
+│   │   ├── prisma.config.ts
+│   │   └── tsconfig.json
+│   └── web/
+│       ├── public/
+│       │   └── cursor.cur
+│       ├── src/
+│       │   ├── components/
+│       │   │   ├── dashboard/
+│       │   │   │   └── FolderIcon.tsx
+│       │   │   ├── kanban/
+│       │   │   │   ├── AddCard.tsx
+│       │   │   │   ├── Card.tsx
+│       │   │   │   ├── Column.tsx
+│       │   │   │   ├── DeleteZone.tsx
+│       │   │   │   └── DropIndicator.tsx
+│       │   │   ├── live/
+│       │   │   │   └── LiveParticipants.tsx
+│       │   │   ├── ManageLinksModal.tsx
+│       │   │   ├── PageToolbar.tsx
+│       │   │   ├── ShareEdit.tsx
+│       │   │   ├── ShareModal.tsx
+│       │   │   ├── ShareView.tsx
+│       │   │   ├── Sidebar.tsx
+│       │   │   ├── SlashCommandList.tsx
+│       │   │   └── TemplatesModal.tsx
+│       │   ├── context/
+│       │   │   └── TemplatesModalContext.tsx
+│       │   ├── db/
+│       │   │   └── localDb.ts
+│       │   ├── features/
+│       │   │   ├── editor/
+│       │   │   │   ├── commands/
+│       │   │   │   │   └── slashItems.ts
+│       │   │   │   └── extensions/
+│       │   │   │       └── SlashCommand.tsx
+│       │   │   ├── live/
+│       │   │   │   └── provider.ts
+│       │   │   └── share/
+│       │   │       └── components/
+│       │   │           ├── SharedKanban.tsx
+│       │   │           ├── SharedList.tsx
+│       │   │           └── SharedMarkdown.tsx
+│       │   ├── layouts/
+│       │   │   └── AppLayout.tsx
+│       │   ├── pages/
+│       │   │   ├── Dashboard.tsx
+│       │   │   ├── Kanban.tsx
+│       │   │   ├── List.tsx
+│       │   │   ├── Markdown.tsx
+│       │   │   ├── SharedPage.tsx
+│       │   │   ├── StarredPage.tsx
+│       │   │   └── TrashPage.tsx
+│       │   ├── routes/
+│       │   │   └── AppRoutes.tsx
+│       │   ├── services/
+│       │   │   └── syncService.ts
+│       │   ├── types/
+│       │   │   ├── kanbanTypes.ts
+│       │   │   ├── pageToolbarType.ts
+│       │   │   └── pageType.ts
+│       │   ├── utils/
+│       │   │   └── dashboard/
+│       │   │       └── helpers.ts
+│       │   ├── App.tsx
+│       │   ├── index.css
+│       │   └── main.tsx
+│       ├── .gitignore
+│       ├── eslint.config.js
+│       ├── index.html
+│       ├── package.json
+│       ├── README.md
+│       ├── tsconfig.app.json
+│       ├── tsconfig.json
+│       ├── tsconfig.node.json
+│       └── vite.config.ts
+├── .gitignore
+├── package.json
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── README.md
+├── to-do.txt
+└── turbo.json
+```
