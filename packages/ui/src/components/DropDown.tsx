@@ -15,7 +15,6 @@ import {
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Slot } from "@radix-ui/react-slot";
-import { ChevronDown } from "lucide-react";
 import { Button } from "./Button";
 import { cn } from "../lib/utils";
 
@@ -37,13 +36,10 @@ function useDropdownContext() {
   return ctx;
 }
 
-/** Public escape hatch for consumers who want the open state (e.g. to animate a trigger icon). */
 function useDropdown() {
   const { open, setOpen } = useDropdownContext();
   return { open, setOpen };
 }
-
-// ---------- pure positioning math (kept side-effect free so it's unit-testable, see dropdown.position.test.ts) ----------
 
 type MenuPositionInput = {
   triggerRect: DOMRect;
@@ -172,8 +168,6 @@ export function DropdownTrigger({
       setOpen((p) => !p);
     });
 
-  // ponytail: asChild covers "wrap my own element" needs via Radix Slot (handles ref + event merging correctly);
-  // dropped the old manual cloneElement branch since Slot already does this, and one path is one fewer bug surface.
   const Comp = asChild ? Slot : "button";
   return (
     <Comp
@@ -205,7 +199,7 @@ export function DropdownContent({
   side = "bottom",
   align = "start",
   sideOffset = 8,
-  alignOffset = 0
+  alignOffset = 0,
 }: DropdownContentProps) {
   const reducedMotion = useReducedMotion();
   const { open, contentRef, triggerRef } = useDropdownContext();
@@ -230,7 +224,7 @@ export function DropdownContent({
         sideOffset,
         viewportWidth: window.innerWidth,
         viewportHeight: window.innerHeight,
-        alignOffset
+        alignOffset,
       });
       setStyle({
         position: "fixed",
@@ -241,7 +235,6 @@ export function DropdownContent({
       });
     };
     update();
-    // ResizeObserver covers content whose size changes after items load/filter, not just window resize.
     const ro = new ResizeObserver(update);
     if (contentRef.current) ro.observe(contentRef.current);
     window.addEventListener("resize", update);
@@ -253,7 +246,6 @@ export function DropdownContent({
     };
   }, [open, side, align, sideOffset, triggerRef, contentRef]);
 
-  // Move real DOM focus to the first item on open, and support arrow/home/end roving focus (ARIA menu pattern).
   useEffect(() => {
     if (!open) return;
     const id = requestAnimationFrame(() =>
@@ -316,8 +308,6 @@ export function DropdownContent({
               : { opacity: 0, y: -4, scale: 0.98, filter: "blur(2px)" }
           }
           transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
-          // ponytail: no full focus trap — Tab can still leave the menu, matching native <select>/menubutton
-          // ergonomics. Upgrade to a trap only if this ever needs to behave like a modal dialog.
         >
           {children}
         </motion.div>
@@ -380,71 +370,5 @@ type DropdownSeparatorProps = { className?: string };
 export function DropdownSeparator({ className }: DropdownSeparatorProps) {
   return (
     <div role="separator" className={cn("my-1 h-px bg-border", className)} />
-  );
-}
-
-// ---------- Convenience wrapper: same shape as the old options-array DropdownMenu, built on the primitives above ----------
-
-type SimpleDropdownOption = {
-  label: string;
-  onClick: () => void;
-  icon?: ReactNode;
-  destructive?: boolean;
-  disabled?: boolean;
-};
-type SimpleDropdownProps = {
-  options: SimpleDropdownOption[];
-  children: ReactNode;
-  side?: DropdownSide;
-  align?: DropdownAlign;
-};
-
-function AnimatedChevron() {
-  const { open } = useDropdown();
-  return (
-    <motion.span
-      className="inline-flex"
-      animate={{ rotate: open ? 180 : 0 }}
-      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-    >
-      <ChevronDown className="h-4 w-4 opacity-60" />
-    </motion.span>
-  );
-}
-
-function SimpleDropdown({
-  options,
-  children,
-  side,
-  align,
-}: SimpleDropdownProps) {
-  return (
-    <Dropdown>
-      <DropdownTrigger asChild>
-        <Button variant="outline" className="gap-2">
-          {children}
-          <AnimatedChevron />
-        </Button>
-      </DropdownTrigger>
-      <DropdownContent side={side} align={align}>
-        {options.length ? (
-          options.map((o) => (
-            <DropdownItem
-              key={o.label}
-              onClick={o.onClick}
-              icon={o.icon}
-              destructive={o.destructive}
-              disabled={o.disabled}
-            >
-              {o.label}
-            </DropdownItem>
-          ))
-        ) : (
-          <div className="px-3 py-2 text-sm text-muted-foreground">
-            No options
-          </div>
-        )}
-      </DropdownContent>
-    </Dropdown>
   );
 }

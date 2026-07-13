@@ -94,13 +94,16 @@ const PageToolbar = ({
   }, []);
 
   return (
-    <header className={`sticky top-0 z-50 flex items-center justify-between px-6 py-3 border-b border-neutral-200 transition-all
-    ${isModalOpen ? "bg-white/40 backdrop-blur-md" : "bg-white/90 backdrop-blur"}`}>
+    <header
+      className={`sticky top-0 z-50 flex items-center justify-between px-6 py-3 border-b border-neutral-200 transition-all
+    ${isModalOpen ? "bg-white/40 backdrop-blur-md" : "bg-white/90 backdrop-blur"}`}
+    >
       {/* Left */}
       <div className="flex items-center gap-2">
         <button
-          onClick={() => navigate('/pages')}
-          className="p-2 rounded-md hover:bg-neutral-100">
+          onClick={() => navigate("/pages")}
+          className="p-2 squircle-md hover:bg-neutral-100"
+        >
           <ArrowLeft size={18} />
         </button>
 
@@ -116,8 +119,11 @@ const PageToolbar = ({
             </div>
           ) : (
             <div
-              className={`flex items-center gap-1 text-sm ${isOnline ? "text-green-600" : "text-neutral-500"}`}>
-              <div className={`h-2 w-2 rounded-full ${isOnline ? "bg-green-500" : "bg-neutral-400"}`} />
+              className={`flex items-center gap-1 text-sm ${isOnline ? "text-green-600" : "text-neutral-500"}`}
+            >
+              <div
+                className={`h-2 w-2 rounded-full ${isOnline ? "bg-green-500" : "bg-neutral-400"}`}
+              />
               {isOnline ? "Online" : "Offline"}
             </div>
           )}
@@ -126,19 +132,19 @@ const PageToolbar = ({
 
       {/* Right */}
       <div className="flex items-center gap-1">
+        <LiveParticipants participants={mockParticipants} maxVisible={4} />
 
-        <LiveParticipants
-          participants={mockParticipants}
-          maxVisible={4}
-        />
-
-        <button className="p-2 rounded-md hover:bg-neutral-100" onClick={() => setShareOpen(true)}>
+        <button
+          className="p-2 squircle-md hover:bg-neutral-100"
+          onClick={() => setShareOpen(true)}
+        >
           <Share2 size={18} />
         </button>
 
         <button
           onClick={handleToggleStar}
-          className="p-2 rounded-md hover:bg-neutral-100">
+          className="p-2 squircle-md hover:bg-neutral-100"
+        >
           <Star
             size={18}
             className={`transition-all duration-200 ${isStarred ? "fill-yellow-400 text-yellow-400" : "text-black"}`}
@@ -148,18 +154,19 @@ const PageToolbar = ({
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setOpen(!open)}
-            className="p-2 rounded-md hover:bg-neutral-100">
+            className="p-2 squircle-md hover:bg-neutral-100"
+          >
             <MoreHorizontal size={18} />
           </button>
 
           {open && (
-            <div
-              className="absolute right-0 top-11 w-52 bg-white border border-neutral-200 rounded-xl shadow-lg py-1">
+            <div className="absolute right-0 top-11 w-52 bg-white border border-neutral-200 squircle-xl shadow-lg py-1">
               <button
                 onClick={() => {
-                  setShowDeleteModal(true)
+                  setShowDeleteModal(true);
                 }}
-                className="w-full flex items-center gap-2 px-3 py-2 text-red-500 hover:bg-red-50">
+                className="w-full flex items-center gap-2 px-3 py-2 text-red-500 hover:bg-red-50"
+              >
                 <Trash2 size={16} />
                 Delete
               </button>
@@ -193,17 +200,17 @@ const PageToolbar = ({
               <button
                 onClick={() => setShowDeleteModal(false)}
                 disabled={isDeleting}
-                className="rounded-md border px-4 py-2 hover:bg-neutral-50">
+                className="rounded-md border px-4 py-2 hover:bg-neutral-50"
+              >
                 Nah
               </button>
 
               <button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="flex items-center gap-2 rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600 disabled:opacity-50">
-                {isDeleting && (
-                  <Loader2 size={16} className="animate-spin" />
-                )}
+                className="flex items-center gap-2 rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600 disabled:opacity-50"
+              >
+                {isDeleting && <Loader2 size={16} className="animate-spin" />}
                 Yes, Got for it.
               </button>
             </div>
