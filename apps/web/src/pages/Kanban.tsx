@@ -1,6 +1,6 @@
 // Tasks : 
 // user should be able to add new columns and delete existing ones
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { db } from "../db/localDb";
 import { useParams } from "react-router-dom";
 import PageToolbar from "../components/PageToolbar";
@@ -22,10 +22,12 @@ const Kanban = () => {
   const [cards, setCards] = useState<CardType[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [loadedPageId, setLoadedPageId] = useState<string | null>(null);
+  const lastSavedRef = useRef<string | null>(null);
   const { id } = useParams();
   const { isTemplatesModalOpen } = useTemplatesModal();
 
-  const savePage = async () => {
+  const savePage = useCallback(async (snapshot: string) => {
     if (!id) return;
 
     try {
@@ -40,6 +42,7 @@ const Kanban = () => {
           pendingSync: true,
           updatedAt: new Date().toISOString(),
         });
+        lastSavedRef.current = snapshot;
         return;
       }
 
@@ -56,10 +59,11 @@ const Kanban = () => {
         pendingSync: false,
         updatedAt: page.updatedAt,
       });
+      lastSavedRef.current = snapshot;
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [cards, columns, id, starred, title]);
 
   const syncPendingPages = async () => {
     try {
@@ -68,24 +72,14 @@ const Kanban = () => {
         .toArray();
 
       for (const page of pending) {
-        try {
-          const pending = await db.pages
-            .filter((page) => page.pendingSync)
-            .toArray();
+        await FileService.updateFile(page.id, {
+          title: page.title,
+          content: page.content,
+        });
 
-          for (const page of pending) {
-            await FileService.updateFile(page.id, {
-              title: page.title,
-              content: page.content,
-            });
-
-            await db.pages.update(page.id, {
-              pendingSync: false,
-            });
-          }
-        } catch (err) {
-          console.error(err);
-        }
+        await db.pages.update(page.id, {
+          pendingSync: false,
+        });
       }
     } catch (err) {
       console.error(err);
@@ -105,6 +99,12 @@ const Kanban = () => {
           const cols = normalizeColumns(localPage.content?.columns);
           setColumns(cols);
           setCards(normalizeCards(localPage.content?.cards, cols));
+          lastSavedRef.current = JSON.stringify({
+            title: localPage.title,
+            starred: localPage.starred,
+            content: { columns: cols, cards: normalizeCards(localPage.content?.cards, cols) },
+          });
+          setLoadedPageId(id);
           return;
         }
 
@@ -114,6 +114,12 @@ const Kanban = () => {
           const cols = normalizeColumns(localPage.content?.columns);
           setColumns(cols);
           setCards(normalizeCards(localPage.content?.cards, cols));
+          lastSavedRef.current = JSON.stringify({
+            title: localPage.title,
+            starred: localPage.starred,
+            content: { columns: cols, cards: normalizeCards(localPage.content?.cards, cols) },
+          });
+          setLoadedPageId(id);
           return;
         }
 
@@ -138,6 +144,12 @@ const Kanban = () => {
 
         setColumns(cols);
         setCards(normalizedCards);
+        lastSavedRef.current = JSON.stringify({
+          title: page.title,
+          starred: page.starred,
+          content: { columns: cols, cards: normalizedCards },
+        });
+        setLoadedPageId(id);
       }
       catch (error) {
         console.error("Failed to load page:", error);
@@ -149,12 +161,18 @@ const Kanban = () => {
   useEffect(() => {
     if (!id) return;
 
+    if (loadedPageId !== id) return;
+
+    const content = { columns, cards };
+    const snapshot = JSON.stringify({ title, starred, content });
+    if (lastSavedRef.current === snapshot) return;
+
     const timeout = setTimeout(() => {
-      void savePage();
+      void savePage(snapshot);
     }, 1000);
 
     return () => clearTimeout(timeout);
-  }, [title, columns, cards, id]);
+  }, [cards, columns, id, loadedPageId, savePage, starred, title]);
 
   useEffect(() => {
     const handleOnline = async () => {

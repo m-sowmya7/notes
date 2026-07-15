@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import PageToolbar from "../components/PageToolbar";
 import { useTemplatesModal } from "../context/TemplatesModalContext";
@@ -21,10 +21,12 @@ const List = () => {
   const [starred, setStarred] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [loadedPageId, setLoadedPageId] = useState<string | null>(null);
+  const lastSavedRef = useRef<string | null>(null);
 
   const [items, setItems] = useState<ListItem[]>([createListItem()]);
 
-  const savePage = async () => {
+  const savePage = useCallback(async (snapshot: string) => {
     if (!id) return;
 
     try {
@@ -39,6 +41,7 @@ const List = () => {
           pendingSync: true,
           updatedAt: new Date().toISOString(),
         });
+        lastSavedRef.current = snapshot;
         return;
       }
 
@@ -55,10 +58,11 @@ const List = () => {
         pendingSync: false,
         updatedAt: page.updatedAt,
       });
+      lastSavedRef.current = snapshot;
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [id, items, starred, title]);
 
   const syncPendingPages = async () => {
     try {
@@ -67,24 +71,14 @@ const List = () => {
         .toArray();
 
       for (const page of pending) {
-        try {
-          const pending = await db.pages
-            .filter((page) => page.pendingSync)
-            .toArray();
+        await FileService.updateFile(page.id, {
+          title: page.title,
+          content: page.content,
+        });
 
-          for (const page of pending) {
-            await FileService.updateFile(page.id, {
-              title: page.title,
-              content: page.content,
-            });
-
-            await db.pages.update(page.id, {
-              pendingSync: false,
-            });
-          }
-        } catch (error) {
-          console.error(error);
-        }
+        await db.pages.update(page.id, {
+          pendingSync: false,
+        });
       }
     } catch (error) {
       console.error(error);
@@ -102,6 +96,12 @@ const List = () => {
           setTitle(localPage.title);
           setStarred(localPage.starred);
           setItems(normalizeListItems(localPage.content.items));
+          lastSavedRef.current = JSON.stringify({
+            title: localPage.title,
+            starred: localPage.starred,
+            content: { items: normalizeListItems(localPage.content.items) },
+          });
+          setLoadedPageId(id);
           return;
         }
 
@@ -109,6 +109,12 @@ const List = () => {
           setTitle(localPage.title);
           setStarred(localPage.starred);
           setItems(normalizeListItems(localPage.content.items));
+          lastSavedRef.current = JSON.stringify({
+            title: localPage.title,
+            starred: localPage.starred,
+            content: { items: normalizeListItems(localPage.content.items) },
+          });
+          setLoadedPageId(id);
           return;
         }
 
@@ -125,7 +131,14 @@ const List = () => {
 
         setTitle(page.title);
         setStarred(page.starred);
-        setItems(normalizeListItems(page.content.items));
+        const normalizedItems = normalizeListItems(page.content.items);
+        setItems(normalizedItems);
+        lastSavedRef.current = JSON.stringify({
+          title: page.title,
+          starred: page.starred,
+          content: { items: normalizedItems },
+        });
+        setLoadedPageId(id);
       } catch (error) {
         console.error(error);
       }
@@ -135,12 +148,18 @@ const List = () => {
   }, [id]);
 
   useEffect(() => {
+    if (!id || loadedPageId !== id) return;
+
+    const content = { items: normalizeListItems(items) };
+    const snapshot = JSON.stringify({ title, starred, content });
+    if (lastSavedRef.current === snapshot) return;
+
     const timeout = setTimeout(() => {
-      void savePage();
+      void savePage(snapshot);
     }, 1000);
 
     return () => clearTimeout(timeout);
-  }, [title, items]);
+  }, [id, items, loadedPageId, savePage, starred, title]);
 
   useEffect(() => {
     const handleOnline = async () => {
