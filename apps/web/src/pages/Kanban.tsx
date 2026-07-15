@@ -1,8 +1,5 @@
 // Tasks : 
-// 1. add localdb to store the page data and sync with server when online
-// 2. enable editing the card title and tasks
-// 3. user should be able to add new columns and delete existing ones
-// 4. make components for this, currently everything is in one file for ease of development but it should be split up
+// user should be able to add new columns and delete existing ones
 import { useEffect, useState } from "react";
 import { db } from "../db/localDb";
 import { useParams } from "react-router-dom";
@@ -16,13 +13,11 @@ import {
   normalizeColumns,
   type NormalizedColumn,
 } from "../utils/boardItems";
-import { apiBaseUrl } from "../utils/runtimeConfig";
-const user = localStorage.getItem("userId") ?? "";
+import { FileService } from "../services/file.service";
 
 const Kanban = () => {
   const [title, setTitle] = useState("");
   const [starred, setStarred] = useState(false);
-  // const [cards, setCards] = useState<CardType[]>([]);
   const [columns, setColumns] = useState<NormalizedColumn[]>([]);
   const [cards, setCards] = useState<CardType[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -45,36 +40,21 @@ const Kanban = () => {
           pendingSync: true,
           updatedAt: new Date().toISOString(),
         });
-
         return;
       }
 
-      const res = await fetch(
-        `${apiBaseUrl}/pages/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "x-user-id": user,
-          },
-          body: JSON.stringify({
-            title,
-            content,
-          }),
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error("Failed to save");
-      }
+      const page = await FileService.updateFile(id, {
+        title,
+        content,
+      });
 
       await db.pages.put({
-        id,
-        title,
-        starred,
-        content,
+        id: page.id,
+        title: page.title,
+        starred: page.starred,
+        content: page.content,
         pendingSync: false,
-        updatedAt: new Date().toISOString(),
+        updatedAt: page.updatedAt,
       });
     } catch (err) {
       console.error(err);
@@ -88,28 +68,24 @@ const Kanban = () => {
         .toArray();
 
       for (const page of pending) {
-        const res = await fetch(
-          `${apiBaseUrl}/pages/${page.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              "x-user-id": user,
-            },
-            body: JSON.stringify({
+        try {
+          const pending = await db.pages
+            .filter((page) => page.pendingSync)
+            .toArray();
+
+          for (const page of pending) {
+            await FileService.updateFile(page.id, {
               title: page.title,
               content: page.content,
-            }),
+            });
+
+            await db.pages.update(page.id, {
+              pendingSync: false,
+            });
           }
-        );
-
-        if (res.ok) {
-          await db.pages.update(page.id, {
-            pendingSync: false,
-          });
+        } catch (err) {
+          console.error(err);
         }
-
-        if (!res.ok) throw new Error('Failed to sync page');
       }
     } catch (err) {
       console.error(err);
@@ -141,13 +117,7 @@ const Kanban = () => {
           return;
         }
 
-        const res = await fetch(`${apiBaseUrl}/pages/${id}`, {
-          headers: {
-            "x-user-id": user || "",
-          }
-        });
-
-        const page = await res.json();
+        const page = await FileService.getFile(id);
 
         await db.pages.put({
           id: page.id,
@@ -160,7 +130,6 @@ const Kanban = () => {
 
         setTitle(page.title);
         setStarred(page.starred);
-        // setCards(page.content?.cards || []);
         const cols = normalizeColumns(page.content?.columns);
         const normalizedCards = normalizeCards(
           page.content?.cards,
@@ -175,7 +144,7 @@ const Kanban = () => {
       }
     };
     loadPage();
-  }, [id, user]);
+  }, [id]);
 
   useEffect(() => {
     if (!id) return;
@@ -248,27 +217,6 @@ const Kanban = () => {
               setCards={setCards}
             />
           ))}
-
-          {/* <Column
-            title="Todo"
-            column="todo"
-            cards={cards}
-            setCards={setCards}
-          />
-
-          <Column
-            title="In Progress"
-            column="doing"
-            cards={cards}
-            setCards={setCards}
-          />
-
-          <Column
-            title="Done"
-            column="done"
-            cards={cards}
-            setCards={setCards}
-          /> */}
         </div>
       </div>
     </div>

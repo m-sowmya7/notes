@@ -13,6 +13,7 @@
     "@hocuspocus/provider": "^4.3.0",
     "@hocuspocus/provider-react": "^4.3.0",
     "@notes/ui": "workspace:*",
+    "@tanstack/react-query": "^5.101.2",
     "@tiptap/core": "^3.26.1",
     "@tiptap/extension-blockquote": "^3.26.1",
     "@tiptap/extension-collaboration": "^3.26.0",
@@ -23,6 +24,7 @@
     "@tiptap/react": "^3.26.0",
     "@tiptap/starter-kit": "^3.26.0",
     "@tiptap/suggestion": "^3.26.1",
+    "axios": "^1.18.1",
     "dexie": "^4.4.3",
     "dotenv": "^17.4.2",
     "lucide-react": "^1.17.0",
@@ -31,6 +33,7 @@
     "react-dom": "^19.2.6",
     "react-icons": "^5.6.0",
     "react-router-dom": "^7.17.0",
+    "tanstack": "^2.0.3",
     "tippy.js": "^6.3.7",
     "y-websocket": "^3.0.0",
     "yjs": "^13.6.31"

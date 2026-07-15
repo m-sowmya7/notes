@@ -8,9 +8,10 @@ import { SlashCommand } from "../features/editor/extensions/SlashCommand";
 import PageToolbar from "../components/PageToolbar";
 import { useTemplatesModal } from "../context/TemplatesModalContext";
 import { syncPendingPages } from "../services/syncService";
-import { apiBaseUrl } from "../utils/runtimeConfig";
+// import { apiBaseUrl } from "../utils/runtimeConfig";
+import { FileService } from "../services/file.service";
 
-const user = localStorage.getItem("userId") ?? "";
+// const user = localStorage.getItem("userId") ?? "";
 
 const Markdown = () => {
   const { id } = useParams();
@@ -55,31 +56,18 @@ const Markdown = () => {
         return;
       }
 
-      const res = await fetch(`${apiBaseUrl}/pages/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "x-user-id": user,
-          },
-          body: JSON.stringify({
-            title,
-            content
-          }),
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error("Failed to save");
-      }
+      const page = await FileService.updateFile(id, {
+      title,
+      content,
+    });
 
       await db.pages.put({
-        id,
-        title,
-        starred,
-        content,
+        id : page.id,
+        title : page.title,
+        starred : page.starred,
+        content : page.content,
         pendingSync: false,
-        updatedAt: new Date().toISOString(),
+        updatedAt: page.updatedAt,
       });
 
     } catch (err) {
@@ -101,16 +89,7 @@ const Markdown = () => {
           return;
         }
 
-        const res = await fetch(`${apiBaseUrl}/pages/${id}`, {
-          method: "GET",
-          headers: {
-            "x-user-id": user || "",
-          },
-        });
-
-        if (!res.ok) throw new Error();
-
-        const page = await res.json();
+        const page = await FileService.getFile(id);
 
         await db.pages.put({
           id: page.id,

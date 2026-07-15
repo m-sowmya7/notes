@@ -7,6 +7,7 @@ import ManageLinksModal from "../components/ManageLinksModal";
 import { mockParticipants } from "./live/LiveParticipants";
 import LiveParticipants from "./live/LiveParticipants";
 import { apiBaseUrl } from "../utils/runtimeConfig";
+import { Button, Modal } from "@notes/ui";
 
 const PageToolbar = ({
   pageId,
@@ -100,15 +101,15 @@ const PageToolbar = ({
   return (
     <>
       <header
-      className={`sticky top-0 z-50 flex items-center justify-between px-6 py-3 border-b border-neutral-200 transition-all
+        className={`sticky top-0 z-50 flex items-center justify-between px-6 py-3 border-b border-neutral-200 transition-all
     ${isModalOpen ? "bg-white/40 backdrop-blur-md" : "bg-white/90 backdrop-blur"}`}
-    >
+      >
         {/* Left */}
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate("/pages")}
             className="p-2 squircle-md hover:bg-neutral-100"
-        >
+          >
             <ArrowLeft size={18} />
           </button>
 
@@ -141,9 +142,9 @@ const PageToolbar = ({
           />
 
           <button
-          className="p-2 squircle-md hover:bg-neutral-100"
-          onClick={() => setShareOpen(true)}
-        >
+            className="p-2 squircle-md hover:bg-neutral-100"
+            onClick={() => setShareOpen(true)}
+          >
             <Share2 size={18} />
           </button>
 
@@ -159,7 +160,7 @@ const PageToolbar = ({
           <button
             onClick={handleToggleStar}
             className="p-2 squircle-md hover:bg-neutral-100"
-        >
+          >
             <Star
               size={18}
               className={`transition-all duration-200 ${isStarred ? "fill-yellow-400 text-yellow-400" : "text-black"}`}
@@ -170,7 +171,7 @@ const PageToolbar = ({
             <button
               onClick={() => setOpen(!open)}
               className="p-2 squircle-md hover:bg-neutral-100"
-          >
+            >
               <MoreHorizontal size={18} />
             </button>
 
@@ -179,7 +180,8 @@ const PageToolbar = ({
                 className="absolute right-0 top-11 w-52 bg-white border border-neutral-200 rounded-xl shadow-lg py-1">
                 <button
                   onClick={() => {
-                    setShowDeleteModal(true)
+                    setOpen(false);
+                    setShowDeleteModal(true);
                   }}
                   className="w-full flex items-center gap-2 px-3 py-2 text-red-500 hover:bg-red-50">
                   <Trash2 size={16} />
@@ -195,44 +197,42 @@ const PageToolbar = ({
           onClose={() => setShareOpen(false)}
           title={title}
         />
-        {showDeleteModal && (
-          <div className="fixed inset-0 z-100 m-75 flex items-center justify-center bg-black/40">
-            <div className="w-full max-w-md rounded-xl bg-red-50 p-6 shadow-xl">
-              <h2 className="text-lg font-semibold text-neutral-900">
-                Delete Page
-              </h2>
-
-              <p className="mt-2 text-sm text-black">
-                Bestie, are you absolutely sure you wanna delete{" "}
-                <span className="font-medium">{title}</span>?
-              </p>
-
-              <p className="mt-1 text-sm text-black">
-                This action cannot be ctrl+z'd.
-              </p>
-
-              <div className="mt-6 flex justify-end gap-3">
-                <button
-                  onClick={() => setShowDeleteModal(false)}
-                  disabled={isDeleting}
-                  className="rounded-md border px-4 py-2 hover:bg-neutral-50"
+        <Modal
+          open={showDeleteModal}
+          onOpenChange={(nextOpen) => {
+            if (!isDeleting) setShowDeleteModal(nextOpen);
+          }}
+          title="Delete???"
+          description="This action can't be ctrl+z'ed."
+          size="sm"
+          footer={
+            <>
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
               >
-                  Nah
-                </button>
-
-                <button
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="flex items-center gap-2 rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600 disabled:opacity-50">
-                  {isDeleting && (
-                    <Loader2 size={16} className="animate-spin" />
-                  )}
-                  Yes, Got for it.
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+                Nah
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting && <Loader2 className="animate-spin" />}
+                Yup, Go for it!
+              </Button>
+            </>
+          }
+        >
+          <p className="text-body text-muted-foreground">
+            Bestie, are you sure you want to delete{" "}
+            <span className="font-semibold text-foreground">
+              {title || "Untitled"}
+            </span>
+            ?
+          </p>
+        </Modal>
       </header>
       <ManageLinksModal
         open={showLinksModal}

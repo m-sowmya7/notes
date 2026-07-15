@@ -70,6 +70,17 @@ export const ShareLinkRepository = {
     });
   },
 
+  findReusableByPageAndAccess(pageId: string, access: AccessLevel) {
+    return prisma.shareLink.findFirst({
+      where: {
+        pageId,
+        access,
+        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+      },
+      orderBy: { createdAt: "asc" },
+    });
+  },
+
   update(id: string, data: Partial<{ access: AccessLevel; expiresAt: Date }>) {
     return prisma.shareLink.update({
       where: { id },

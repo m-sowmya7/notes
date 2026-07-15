@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { apiBaseUrl } from "../utils/runtimeConfig";
+import { FileService } from "../services/file.service";
 
 type TemplatesModalProps = {
   open: boolean;
@@ -14,14 +14,14 @@ const templates = [
     description: "Simple markdown document",
     type: "MARKDOWN",
     path: "/editor/markdown",
-    bg: "bg-blue-100",
+    bg: "bg-[#dfe8d2]",
     icon: (
       <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
         <path
           d="M22 14H42L50 22V58H22V14Z"
           stroke="#5B5B5B"
           strokeWidth="2"
-          fill="#DBEAFE"
+          fill="#c7d4b3"
         />
         <path
           d="M42 14V22H50"
@@ -38,7 +38,7 @@ const templates = [
     description: "Organize tasks and ideas",
     type: "LIST",
     path: "/editor/list",
-    bg: "bg-[#dfe8d2]",
+    bg: "bg-blue-100",
     icon: (
       <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
         <rect
@@ -47,7 +47,7 @@ const templates = [
           width="44"
           height="44"
           rx="4"
-          fill="#c7d4b3"
+          fill="#88a8d3"
           stroke="#5B5B5B"
           strokeWidth="1.5"
         />
@@ -75,7 +75,7 @@ const templates = [
     description: "Track workflows visually",
     type: "KANBAN",
     path: "/editor/kanban",
-    bg: "bg-[#dfdcfa]",
+    bg: "bg-pink-100",
     icon: (
       <svg width="80" height="72" viewBox="0 0 80 72" fill="none">
         <rect
@@ -84,7 +84,7 @@ const templates = [
           width="18"
           height="44"
           rx="2"
-          fill="#c9c2f3"
+          fill="#d7a2dc"
           stroke="#5B5B5B"
           strokeWidth="1.5"
         />
@@ -95,7 +95,7 @@ const templates = [
           width="18"
           height="44"
           rx="2"
-          fill="#c9c2f3"
+          fill="#d7a2dc"
           stroke="#5B5B5B"
           strokeWidth="1.5"
         />
@@ -106,94 +106,39 @@ const templates = [
           width="18"
           height="44"
           rx="2"
-          fill="#c9c2f3"
+          fill="#d7a2dc"
           stroke="#5B5B5B"
           strokeWidth="1.5"
         />
       </svg>
     ),
   },
-];
+] as const;
+
 
 const TemplatesModal = ({ open, onClose }: TemplatesModalProps) => {
   const navigate = useNavigate();
 
-  const createPage = async ( type: string, path: string) => {
+  if (!open) return null;
+
+  const createPage = async (
+    type: "MARKDOWN" | "LIST" | "KANBAN",
+    path: string
+  ) => {
     try {
-      let content: any = {};
-
-      switch (type) {
-        case "MARKDOWN":
-          content = {};
-          break;
-
-        case "LIST":
-          content = {
-            items: [
-              {
-                id: crypto.randomUUID(),
-                text: "",
-                completed: false,
-              },
-            ],
-          };
-          break;
-
-        case "KANBAN":
-          content = {
-            columns: [
-              {
-                id: crypto.randomUUID(),
-                title: "To Do",
-                cards: [],
-              },
-            ],
-          };
-          break;
-
-        default:
-          content = {};
-      }
-
-      const user = localStorage.getItem("userId");
-      const res = await fetch(`${apiBaseUrl}/pages`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-user-id": user || ""
-          },
-          body: JSON.stringify({
-            title: "",
-            type,
-            content,
-          }),
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error(
-          `Failed to create page (${res.status})`
-        );
-      }
-
-      const page = await res.json();
-
-      navigate(`${path}/${page.id}`);
+      const page = await FileService.createFile(type);
 
       onClose();
+
+      navigate(`${path}/${page.id}`);
     } catch (error) {
-      console.error(
-        "Error creating page:",
-        error
-      );
+      console.error("Failed to create page:", error);
     }
   };
 
-  if (!open) return null;
-
   return (
-    <div className=" fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
-      <div className=" relative w-full max-w-202.5 rounded-[28px] border border-neutral-200 bg-white p-10 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
+      <div className="relative w-full max-w-202.5 rounded-[28px] border border-neutral-200 bg-white p-10 shadow-2xl">
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-4xl font-black text-neutral-900">
@@ -215,12 +160,7 @@ const TemplatesModal = ({ open, onClose }: TemplatesModalProps) => {
           {templates.map((template) => (
             <button
               key={template.id}
-              onClick={() =>
-                createPage(
-                  template.type,
-                  template.path
-                )
-              }
+              onClick={() => createPage(template.type, template.path)}
               className={`group flex h-60 w-55 flex-col items-center justify-center gap-4 rounded-2xl border border-neutral-200 ${template.bg} transition duration-200 hover:scale-[1.02] hover:shadow-lg`}>
               {template.icon}
 

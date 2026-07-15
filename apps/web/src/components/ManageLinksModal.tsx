@@ -1,6 +1,7 @@
 import { X, Trash2, Copy, Check } from "lucide-react";
 import { useEffect, useState } from "react";
 import { apiBaseUrl } from "../utils/runtimeConfig";
+import axios from "axios";
 
 type ShareLink = {
     id: string;
@@ -50,18 +51,13 @@ export default function ManageLinksModal({
         const fetchLinks = async () => {
             try {
                 setLoading(true);
+                const res = await axios.get(`${apiBaseUrl}/share-links/page/${pageId}`);
 
-                const res = await fetch(`${apiBaseUrl}/share-links/page/${pageId}`);
-
-                if (!res.ok) {
+                if (!res.status) {
                     throw new Error(`HTTP ${res.status}`);
                 }
-
-                const data = await res.json();
-
-                setLinks(
-                    Array.isArray(data) ? data : Array.isArray(data.links) ? data.links : []
-                );
+                const data = await res.data;
+                setLinks(Array.isArray(data) ? data : Array.isArray(data.links) ? data.links : []);
             } catch (err) {
                 console.error(err);
                 setLinks([]);
@@ -75,14 +71,10 @@ export default function ManageLinksModal({
 
     const deleteLink = async (id: string) => {
         try {
-            const res = await fetch(`${apiBaseUrl}/share-links/${id}`, {
-                method: "DELETE",
-            });
-
-            if (!res.ok) {
-                throw new Error(await res.text());
+            const res = await axios.delete(`${apiBaseUrl}/share-links/${id}`);
+            if (!res.status) {
+                throw new Error(`HTTP ${res.status}`);
             }
-
             setLinks((prev) =>
                 prev.filter((link) => link.id !== id)
             );

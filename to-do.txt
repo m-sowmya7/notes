@@ -1,4 +1,5 @@
 tasks : 
+1. download the file in pdf formart so that even if local storage is removed the data can be protected since no account is used for sign up
 3. verify the necessasary files and folders in both ends
 5. recently deleted??? do i have to ?🫠
 6. collaboration for all the editors - yjs, web sockets etc and what are all needed

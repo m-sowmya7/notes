@@ -9,11 +9,9 @@ import {
   normalizeListItems,
   type NormalizedListItem,
 } from "../utils/listItems";
-import { apiBaseUrl } from "../utils/runtimeConfig";
+import { FileService } from "../services/file.service";
 
 type ListItem = NormalizedListItem;
-
-const user = localStorage.getItem("userId") ?? "";
 
 const List = () => {
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
@@ -44,31 +42,18 @@ const List = () => {
         return;
       }
 
-      const res = await fetch(`${apiBaseUrl}/pages/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "x-user-id": user,
-          },
-          body: JSON.stringify({
-            title,
-            content,
-          }),
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error("Failed to save page");
-      }
+      const page = await FileService.updateFile(id, {
+        title,
+        content,
+      });
 
       await db.pages.put({
-        id,
-        title,
-        starred,
-        content,
+        id: page.id,
+        title: page.title,
+        starred: page.starred,
+        content: page.content,
         pendingSync: false,
-        updatedAt: new Date().toISOString(),
+        updatedAt: page.updatedAt,
       });
     } catch (error) {
       console.error(error);
@@ -82,24 +67,23 @@ const List = () => {
         .toArray();
 
       for (const page of pending) {
-        const res = await fetch(`${apiBaseUrl}/pages/${page.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              "x-user-id": user,
-            },
-            body: JSON.stringify({
+        try {
+          const pending = await db.pages
+            .filter((page) => page.pendingSync)
+            .toArray();
+
+          for (const page of pending) {
+            await FileService.updateFile(page.id, {
               title: page.title,
               content: page.content,
-            }),
-          }
-        );
+            });
 
-        if (res.ok) {
-          await db.pages.update(page.id, {
-            pendingSync: false,
-          });
+            await db.pages.update(page.id, {
+              pendingSync: false,
+            });
+          }
+        } catch (error) {
+          console.error(error);
         }
       }
     } catch (error) {
@@ -128,17 +112,7 @@ const List = () => {
           return;
         }
 
-        const res = await fetch(`${apiBaseUrl}/pages/${id}`,
-          {
-            headers: {
-              "x-user-id": user,
-            },
-          }
-        );
-
-        if (!res.ok) throw new Error("Failed to load page");
-
-        const page = await res.json();
+        const page = await FileService.getFile(id);
 
         await db.pages.put({
           id: page.id,

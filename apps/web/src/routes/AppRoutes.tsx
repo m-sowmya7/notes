@@ -8,6 +8,7 @@ import Kanban from '../pages/Kanban'
 import StarredPage from '../pages/StarredPage'
 import TrashPage from '../pages/TrashPage'
 import SharedPage from '../pages/SharedPage'
+import LivePage from '../pages/LivePage'
 import AppLayout from '../layouts/AppLayout'
 
 const AppRoutes = () => {
@@ -16,6 +17,7 @@ const AppRoutes = () => {
       {/* Landing page WITHOUT sidebar */}
       <Route path="/" element={<App />} />
       <Route path="/share/:token" element={<SharedPage />} />
+      <Route path="/live/:inviteToken" element={<LivePage />} />
       {/* Pages WITH sidebar */}
       <Route element={<AppLayout />}>
         <Route path="/pages" element={<Dashboard />} />

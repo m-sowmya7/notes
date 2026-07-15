@@ -1,16 +1,15 @@
 import { MoreHorizontal, Search, ChevronDown, Star, Share2, Link2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { usePages } from "../hooks/usePages";
+import { useToggleStar } from "../hooks/useToggleStar";
 import { useNavigate } from "react-router-dom";
-import { type Page } from "../types/pageType";
 import ManageLinksModal from "../components/ManageLinksModal";
 import ShareModal from "../components/ShareModal";
 import { getFolderColor, formatEditedTime, SORT_LABELS, type SortOption } from "../utils/dashboard/helpers";
 import { FolderIcon } from "../components/dashboard/FolderIcon";
-import { apiBaseUrl } from "../utils/runtimeConfig";
 import { Button, Dropdown, DropdownTrigger, DropdownContent, DropdownItem } from "@notes/ui";
 
 const DashboardPage = () => {
-  const [pages, setPages] = useState<Page[]>([]);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("recent");
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -19,55 +18,11 @@ const DashboardPage = () => {
   const [selectedPageTitle, setSelectedPageTitle] = useState("");
   const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { data: pages = [] } = usePages();
+  const toggleStarMutation = useToggleStar();
 
-  useEffect(() => {
-    const fetchPages = async () => {
-      try {
-        const user = localStorage.getItem("userId");
-        if (!user) throw new Error("User not found in localStorage");
-        const res = await fetch(`${apiBaseUrl}/pages`, {
-          headers: {
-            "x-user-id": user || "",
-          }
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        setPages(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchPages();
-  }, []);
-
-  const toggleFavorite = async (pageId: string) => {
-    const currentPage = pages.find((p) => p.id === pageId);
-    if (!currentPage) return;
-
-    const newStarValue = !currentPage.starred;
-
-    setPages((prev) =>
-      prev.map((page) =>
-        page.id === pageId ? { ...page, starred: newStarValue } : page
-      )
-    );
-
-    try {
-      const user = localStorage.getItem("userId");
-      await fetch(`${apiBaseUrl}/pages/${pageId}/star`, {
-        method: "PATCH",
-        headers: {
-          "x-user-id": user || "",
-        }
-      });
-    } catch (error) {
-      console.error(error);
-      setPages((prev) =>
-        prev.map((page) =>
-          page.id === pageId ? { ...page, starred: !newStarValue } : page
-        )
-      );
-    }
+  const toggleFavorite = (pageId: string) => {
+    toggleStarMutation.mutate(pageId);
   };
 
   const filteredPages = pages.filter((page) =>
@@ -83,15 +38,11 @@ const DashboardPage = () => {
       case "za":
         return b.title.localeCompare(a.title);
       case "oldest":
-        return (
-          new Date(a.updatedAt ?? 0).getTime() - new Date(b.updatedAt ?? 0).getTime()
-        );
+        return (new Date(a.updatedAt ?? 0).getTime() - new Date(b.updatedAt ?? 0).getTime());
       case "type":
         return (a.type ?? "").localeCompare(b.type ?? "");
       default:
-        return (
-          new Date(b.updatedAt ?? 0).getTime() - new Date(a.updatedAt ?? 0).getTime()
-        );
+        return (new Date(b.updatedAt ?? 0).getTime() - new Date(a.updatedAt ?? 0).getTime());
     }
   });
 
@@ -116,8 +67,7 @@ const DashboardPage = () => {
             <DropdownTrigger asChild>
               <Button
                 variant="outline"
-                className="gap-2 !bg-white !border-border"
-              >
+                className="gap-2 bg-white! border-border!">
                 {SORT_LABELS[sortBy]}
                 <ChevronDown size={16} />
               </Button>
@@ -127,15 +77,13 @@ const DashboardPage = () => {
               alignOffset={-48}
               align="end"
               side="bottom"
-              className="w-48"
-            >
+              className="w-48">
               {(Object.entries(SORT_LABELS) as [SortOption, string][]).map(
                 ([key, label]) => (
                   <DropdownItem
                     key={key}
                     onClick={() => setSortBy(key)}
-                    className={sortBy === key ? "font-semibold" : ""}
-                  >
+                    className={sortBy === key ? "font-semibold" : ""}>
                     {label}
                   </DropdownItem>
                 ),
@@ -154,12 +102,10 @@ const DashboardPage = () => {
               <div
                 key={page.id}
                 onClick={() => navigate(`/editor/${page.type}/${page.id}`)}
-                className={`flex w-full cursor-pointer items-center justify-between px-6 py-5 transition hover:bg-neutral-50 ${
-                  index !== sortedPages.length - 1
-                    ? "border-b border-neutral-100"
-                    : ""
-                }`}
-              >
+                className={`flex w-full cursor-pointer items-center justify-between px-6 py-5 transition hover:bg-neutral-50 ${index !== sortedPages.length - 1
+                  ? "border-b border-neutral-100"
+                  : ""
+                  }`}>
                 <div className="flex items-center gap-5">
                   <FolderIcon color={getFolderColor(page.type)} />
                   <div>
@@ -183,8 +129,7 @@ const DashboardPage = () => {
                       onClick={(e) => {
                         e.stopPropagation();
                         setActiveMenu(activeMenu === page.id ? null : page.id);
-                      }}
-                    >
+                      }}>
                       <MoreHorizontal size={20} className="text-neutral-500" />
                     </button>
                   </div>
@@ -192,8 +137,7 @@ const DashboardPage = () => {
                   {activeMenu === page.id && (
                     <div
                       onClick={(e) => e.stopPropagation()}
-                      className="absolute right-0 top-8 z-50 w-52 rounded-xl border border-neutral-200 bg-white shadow-lg"
-                    >
+                      className="absolute right-0 top-8 z-50 w-52 rounded-xl border border-neutral-200 bg-white shadow-lg">
                       <button
                         onClick={() => {
                           setSelectedPageId(page.id);
@@ -201,8 +145,7 @@ const DashboardPage = () => {
                           setShowShareModal(true);
                           setActiveMenu(null);
                         }}
-                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50"
-                      >
+                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50">
                         <Share2 size={16} />
                         Share
                       </button>
@@ -213,8 +156,7 @@ const DashboardPage = () => {
                           setShowLinksModal(true);
                           setActiveMenu(null);
                         }}
-                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50"
-                      >
+                        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-neutral-50">
                         <Link2 size={16} />
                         Manage Links
                       </button>
@@ -224,8 +166,7 @@ const DashboardPage = () => {
                           toggleFavorite(page.id);
                           setActiveMenu(null);
                         }}
-                        className="flex w-full items-center gap-2 px-4 py-3 text-sm text-yellow-600 hover:bg-neutral-50"
-                      >
+                        className="flex w-full items-center gap-2 px-4 py-3 text-sm text-yellow-600 hover:bg-neutral-50">
                         <Star size={16} />
                         {page.starred ? "Unfavorite" : "Favorite"}
                       </button>

@@ -53,9 +53,10 @@ const ShareModal = ({
   const [copied, setCopied] = useState(false);
   const [shareLink, setShareLink] = useState("");
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
-  // const [isLiveStarting, setIsLiveStarting] = useState(false);
+  const [liveSessionId, setLiveSessionId] = useState<string | null>(null);
+
   const generateShareLink = async (accessLevel: AccessLevel) => {
-    if (!pageId) return;
+    if (!pageId || accessLevel === "live") return;
 
     try {
       setIsGeneratingLink(true);
@@ -83,18 +84,42 @@ const ShareModal = ({
     }
   };
 
-  useEffect(() => {
-    if (!open || !access) return;
-    generateShareLink(access);
-  }, [open, access, pageId]);
+  const startLiveSession = async () => {
+    if (!pageId) return;
+
+    try {
+      setIsGeneratingLink(true);
+      const res = await fetch(`${apiBaseUrl}/share-links/live/${pageId}/start`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: localStorage.getItem("userId") || "" }),
+      });
+
+      if (!res.ok) throw new Error("Failed to start live collaboration");
+
+      const data = await res.json();
+      setLiveSessionId(data.id);
+      setShareLink(data.url);
+    } catch (error) {
+      console.error("Error starting live collaboration:", error);
+    } finally {
+      setIsGeneratingLink(false);
+    }
+  };
 
   useEffect(() => {
-    if (!open) {
-      setAccess(null);
-      setShareLink("");
-      setCopied(false);
-    }
-  }, [open]);
+    if (!liveSessionId) return;
+
+    const endLiveSession = () => {
+      void fetch(`${apiBaseUrl}/share-links/live/${liveSessionId}/end`, {
+        method: "PATCH",
+        keepalive: true,
+      });
+    };
+
+    window.addEventListener("pagehide", endLiveSession);
+    return () => window.removeEventListener("pagehide", endLiveSession);
+  }, [liveSessionId]);
 
   const handleCopy = async () => {
     if (!shareLink) return;
@@ -110,13 +135,33 @@ const ShareModal = ({
     }
   };
 
+  const closeModal = () => {
+    setAccess(null);
+    setShareLink("");
+    setCopied(false);
+    onClose();
+  };
+
+  const selectAccess = (accessLevel: AccessLevel) => {
+    setShareLink("");
+    setCopied(false);
+    setAccess(accessLevel);
+
+    if (accessLevel === "live") {
+      void startLiveSession();
+      return;
+    }
+
+    void generateShareLink(accessLevel);
+  };
+
   if (!open) return null;
 
   return (
     <Modal
       open={open}
-      onOpenChange={(open) => {
-        if (!open) onClose();
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) closeModal();
       }}
       title={`Spread the tea from "${title || "Untitled"}"`}
     >
@@ -125,9 +170,7 @@ const ShareModal = ({
           <button
             key={id}
             onClick={() => {
-              setShareLink("");
-              setCopied(false);
-              setAccess(id as AccessLevel);
+              selectAccess(id as AccessLevel);
             }}
             className={`group flex h-18 w-full items-center justify-between border px-4 transition-all squircle-xl ${
               access === id
@@ -165,26 +208,48 @@ const ShareModal = ({
         <div className="mt-6">
           <p className="mb-2 text-sm font-medium">Share The Vibe</p>
 
-          <div className="flex gap-2">
-            <input
-              readOnly
-              value={isGeneratingLink ? "Whipping up the link..." : shareLink}
-              className="flex-1 squircle-xl border border-neutral-300 px-3 py-2 outline-none"
-            />
+          {access === "live" ? (
+            <div className="flex gap-2">
+              <input
+                readOnly
+                value={isGeneratingLink ? "Starting the session..." : shareLink}
+                className="flex-1 squircle-xl border border-neutral-300 px-3 py-2 outline-none"
+              />
+              <button
+                onClick={handleCopy}
+                disabled={isGeneratingLink || !shareLink}
+                className={`flex items-center gap-2 squircle-xl px-4 py-2 text-white transition ${
+                  copied
+                    ? "bg-green-600 hover:bg-green-700"
+                    : "bg-violet-600 hover:bg-violet-700"
+                } disabled:cursor-not-allowed disabled:opacity-50`}
+              >
+                <Copy size={16} />
+                {copied ? "Copied!" : "Copy"}
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <input
+                readOnly
+                value={isGeneratingLink ? "Whipping up the link..." : shareLink}
+                className="flex-1 squircle-xl border border-neutral-300 px-3 py-2 outline-none"
+              />
 
-            <button
-              onClick={handleCopy}
-              disabled={isGeneratingLink || !shareLink}
-              className={`flex items-center gap-2 squircle-xl px-4 py-2 text-white transition ${
-                copied
-                  ? "bg-green-600 hover:bg-green-700"
-                  : "bg-violet-600 hover:bg-violet-700"
-              } disabled:cursor-not-allowed disabled:opacity-50`}
-            >
-              <Copy size={16} />
-              {copied ? "Copied!" : "Copy"}
-            </button>
-          </div>
+              <button
+                onClick={handleCopy}
+                disabled={isGeneratingLink || !shareLink}
+                className={`flex items-center gap-2 squircle-xl px-4 py-2 text-white transition ${
+                  copied
+                    ? "bg-green-600 hover:bg-green-700"
+                    : "bg-violet-600 hover:bg-violet-700"
+                } disabled:cursor-not-allowed disabled:opacity-50`}
+              >
+                <Copy size={16} />
+                {copied ? "Copied!" : "Copy"}
+              </button>
+            </div>
+          )}
         </div>
       )}
     </Modal>

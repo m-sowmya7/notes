@@ -25,6 +25,12 @@ export const ShareService = {
 
 export const ShareLinkService = {
   async createShareLink(pageId: string, access: AccessLevel) {
+    const existingLink =
+      await ShareLinkRepository.findReusableByPageAndAccess(pageId, access);
+    if (existingLink) {
+      return existingLink;
+    }
+
     const token = crypto.randomBytes(16).toString("hex");
     if (!token) {
       throw new Error("Failed to generate share link token");
@@ -68,13 +74,9 @@ export const LiveSessionService = {
     if (!page) {
       throw new Error("Page not found");
     }
-    const existingSession =
-      await LiveSessionRepository.getActiveSessionByPageId(pageId);
+    const existingSession = await LiveSessionRepository.getActiveSessionByPageId(pageId);
     if (existingSession) {
-      console.log(
-        "Existing session found, returning it instead of creating a new one.",
-      );
-      return existingSession;
+      await LiveSessionRepository.endSession(existingSession.id);
     }
 
     const inviteToken = crypto.randomUUID();
@@ -82,7 +84,11 @@ export const LiveSessionService = {
   },
 
   async getLiveSessionByToken(inviteToken: string) {
-    return LiveSessionRepository.getSessionByInviteToken(inviteToken);
+    const session = await LiveSessionRepository.getSessionByInviteToken(inviteToken);
+    if (!session || !session.active) {
+      throw new Error("Live session not found or has ended");
+    }
+    return session;
   },
 
   async getLiveSessionById(id: string) {

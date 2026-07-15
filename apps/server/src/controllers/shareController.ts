@@ -139,7 +139,10 @@ export const createLiveSession = async (req: Request, res: Response) => {
         const userId = req.body.userId;
         const pageId = Array.isArray(rawPageId) ? rawPageId[0] : rawPageId;
         const session = await LiveSessionService.createLiveSession(pageId, userId);
-        res.status(201).json(session);
+        res.status(201).json({
+            ...session,
+            url: `${process.env.FRONTEND_URL}/live/${session.inviteToken}`,
+        });
     }
     catch(error) {
         res.status(500).json({ error: "Failed to create a live session" });
