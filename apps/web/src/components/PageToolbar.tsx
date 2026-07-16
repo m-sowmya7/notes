@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import ShareModal from "./ShareModal";
 import { type PageToolbarProps } from "../types/pageToolbarType";
 import ManageLinksModal from "../components/ManageLinksModal";
-import { mockParticipants } from "./live/LiveParticipants";
-import LiveParticipants from "./live/LiveParticipants";
+// import { mockParticipants } from "./live/LiveParticipants";
+// import LiveParticipants from "./live/LiveParticipants";
 import { apiBaseUrl } from "../utils/runtimeConfig";
 import { Button, Modal } from "@notes/ui";
 
@@ -136,10 +136,10 @@ const PageToolbar = ({
         {/* Right */}
         <div className="flex items-center gap-1">
 
-          <LiveParticipants
+          {/*<LiveParticipants
             participants={mockParticipants}
             maxVisible={4}
-          />
+          />*/}
 
           <button
             className="p-2 squircle-md hover:bg-neutral-100"

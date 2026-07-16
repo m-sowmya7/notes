@@ -1,6 +1,7 @@
 import { Copy, Eye, Pencil, Check, Radio } from "lucide-react";
 import { Modal } from "@notes/ui";
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
+import { useState } from "react";
 import { apiBaseUrl } from "../utils/runtimeConfig";
 
 type AccessLevel = "view" | "comment" | "edit" | "live";
@@ -53,7 +54,7 @@ const ShareModal = ({
   const [copied, setCopied] = useState(false);
   const [shareLink, setShareLink] = useState("");
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
-  const [liveSessionId, setLiveSessionId] = useState<string | null>(null);
+  // const [liveSessionId, setLiveSessionId] = useState<string | null>(null);
 
   const generateShareLink = async (accessLevel: AccessLevel) => {
     if (!pageId || accessLevel === "live") return;
@@ -89,17 +90,19 @@ const ShareModal = ({
 
     try {
       setIsGeneratingLink(true);
-      const res = await fetch(`${apiBaseUrl}/share-links/live/${pageId}/start`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: localStorage.getItem("userId") || "" }),
-      });
+      const link = "Wait for a while to unlock the live-colab";
+      setShareLink(link);
+      // const res = await fetch(`${apiBaseUrl}/share-links/live/${pageId}/start`, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ userId: localStorage.getItem("userId") || "" }),
+      // });
 
-      if (!res.ok) throw new Error("Failed to start live collaboration");
+      // if (!res.ok) throw new Error("Failed to start live collaboration");
 
-      const data = await res.json();
-      setLiveSessionId(data.id);
-      setShareLink(data.url);
+      // const data = await res.json();
+      // setLiveSessionId(data.id);
+      // setShareLink(data.url);
     } catch (error) {
       console.error("Error starting live collaboration:", error);
     } finally {
@@ -107,19 +110,19 @@ const ShareModal = ({
     }
   };
 
-  useEffect(() => {
-    if (!liveSessionId) return;
+  // useEffect(() => {
+  //   if (!liveSessionId) return;
 
-    const endLiveSession = () => {
-      void fetch(`${apiBaseUrl}/share-links/live/${liveSessionId}/end`, {
-        method: "PATCH",
-        keepalive: true,
-      });
-    };
+  //   const endLiveSession = () => {
+  //     void fetch(`${apiBaseUrl}/share-links/live/${liveSessionId}/end`, {
+  //       method: "PATCH",
+  //       keepalive: true,
+  //     });
+  //   };
 
-    window.addEventListener("pagehide", endLiveSession);
-    return () => window.removeEventListener("pagehide", endLiveSession);
-  }, [liveSessionId]);
+  //   window.addEventListener("pagehide", endLiveSession);
+  //   return () => window.removeEventListener("pagehide", endLiveSession);
+  // }, [liveSessionId]);
 
   const handleCopy = async () => {
     if (!shareLink) return;
