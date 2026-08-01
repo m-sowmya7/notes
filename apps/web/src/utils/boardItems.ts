@@ -95,10 +95,13 @@ export const normalizeCards = (
 ): CardType[] => {
   if (!Array.isArray(cards)) return [];
 
+  // Live collaboration can initialize before the page's columns are loaded.
+  // Always retain a valid fallback column while normalizing incoming Yjs data.
+  const availableColumns = columns.length > 0 ? columns : defaultColumns();
   const seen = new Set<string>();
 
   const validColumns = new Set(
-    columns.map((c) => c.id)
+    availableColumns.map((c) => c.id)
   );
 
   return cards.map((card) => {
@@ -129,7 +132,7 @@ export const normalizeCards = (
         typeof raw.column === "string" &&
         validColumns.has(raw.column)
           ? raw.column
-          : columns[0].id,
+          : availableColumns[0].id,
     };
   });
 };

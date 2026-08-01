@@ -7,7 +7,7 @@ type ColumnType = "backlog" | "todo" | "doing" | "done";
 interface Card {
   id: string;
   title: string;
-  column: ColumnType;
+  column: string;
 }
 
 export interface KanbanContent {

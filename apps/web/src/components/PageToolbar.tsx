@@ -4,8 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import ShareModal from "./ShareModal";
 import { type PageToolbarProps } from "../types/pageToolbarType";
 import ManageLinksModal from "../components/ManageLinksModal";
-// import { mockParticipants } from "./live/LiveParticipants";
-// import LiveParticipants from "./live/LiveParticipants";
+import LiveParticipants from "./live/LiveParticipants";
 import { apiBaseUrl } from "../utils/runtimeConfig";
 import { Button, Modal } from "@notes/ui";
 
@@ -16,6 +15,7 @@ const PageToolbar = ({
   isOnline,
   isSyncing,
   isModalOpen,
+  liveParticipants = [],
 }: PageToolbarProps) => {
   const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -24,12 +24,103 @@ const PageToolbar = ({
   const [showLinksModal, setShowLinksModal] = useState(false);
   const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
+  const [liveSessionId, setLiveSessionId] = useState<string | null>(null);
+  const [liveInviteToken, setLiveInviteToken] = useState<string | null>(null);
+  const [isLiveSessionOwner, setIsLiveSessionOwner] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [isStarred, setIsStarred] = useState(starred);
 
   useEffect(() => {
     setIsStarred(starred);
   }, [starred]);
+
+  useEffect(() => {
+    if (!pageId) {
+      setLiveSessionId(null);
+      setLiveInviteToken(null);
+      setIsLiveSessionOwner(false);
+      return;
+    }
+
+    let active = true;
+
+    const loadLiveSession = async () => {
+      try {
+        const res = await fetch(`${apiBaseUrl}/share-links/live/page/${pageId}`);
+
+        if (!active) return;
+
+        if (!res.ok) {
+          setLiveSessionId(null);
+          setLiveInviteToken(null);
+          setIsLiveSessionOwner(false);
+          return;
+        }
+
+        const activeSession = (await res.json()) as {
+          active?: boolean;
+          sessionId?: string;
+          inviteToken?: string;
+          createdBy?: string;
+        } | null;
+        const userId = localStorage.getItem("userId");
+
+        if (!activeSession?.active || !activeSession.sessionId) {
+          setLiveSessionId(null);
+          setLiveInviteToken(null);
+          setIsLiveSessionOwner(false);
+          return;
+        }
+
+        setLiveSessionId(activeSession.sessionId);
+        setLiveInviteToken(activeSession.inviteToken ?? null);
+        setIsLiveSessionOwner(Boolean(userId && activeSession.createdBy === userId));
+      } catch (error) {
+        if (!active) return;
+        console.error("Failed to load live session status:", error);
+      }
+    };
+
+    void loadLiveSession();
+    const interval = window.setInterval(() => void loadLiveSession(), 5000);
+
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+    };
+  }, [pageId]);
+
+  const handleEndLiveSession = async () => {
+    if (!liveSessionId) return;
+
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("Missing user id.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${apiBaseUrl}/share-links/live/session/${liveSessionId}/end`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": userId,
+        },
+      });
+
+      if (!res.ok) {
+        const payload = await res.json().catch(() => null) as { error?: string } | null;
+        throw new Error(payload?.error || "Failed to end the live session");
+      }
+
+      setLiveSessionId(null);
+      setLiveInviteToken(null);
+      setIsLiveSessionOwner(false);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  };
 
   const handleToggleStar = async () => {
     try {
@@ -136,10 +227,7 @@ const PageToolbar = ({
         {/* Right */}
         <div className="flex items-center gap-1">
 
-          {/*<LiveParticipants
-            participants={mockParticipants}
-            maxVisible={4}
-          />*/}
+          {liveSessionId && <LiveParticipants participants={liveParticipants} />}
 
           <button
             className="p-2 squircle-md hover:bg-neutral-100"
@@ -196,6 +284,9 @@ const PageToolbar = ({
           pageId={pageId}
           onClose={() => setShareOpen(false)}
           title={title}
+          activeLiveSession={liveSessionId ? { id: liveSessionId, inviteToken: liveInviteToken ?? undefined } : null}
+          canEndLiveSession={isLiveSessionOwner}
+          onEndLiveSession={handleEndLiveSession}
         />
         <Modal
           open={showDeleteModal}

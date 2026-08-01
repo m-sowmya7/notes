@@ -1,0 +1,1 @@
+ALTER TABLE "LiveRoom" ADD COLUMN "yjsState" BYTEA;

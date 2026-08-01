@@ -1,3 +1,5 @@
+import type { Participant } from "../components/live/LiveParticipants";
+
 export type PageToolbarProps = {
   pageId: string;
   title: string;
@@ -5,4 +7,5 @@ export type PageToolbarProps = {
   isOnline: boolean;
   isSyncing: boolean;
   isModalOpen?: boolean;
+  liveParticipants?: Participant[];
 };

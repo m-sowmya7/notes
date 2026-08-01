@@ -6,14 +6,13 @@ import './styles/globals.css'
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import AppRoutes from './routes/AppRoutes';
+import { LiveProvider } from './features/live/LiveContext';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <TemplatesModalProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
+        <LiveProvider><BrowserRouter><AppRoutes /></BrowserRouter></LiveProvider>
       </TemplatesModalProvider>
     </QueryClientProvider>
   </React.StrictMode>

@@ -1,12 +1,13 @@
 import {
   ShareRepository,
   ShareLinkRepository,
-  LiveSessionRepository,
 } from "../repositories/shareRepository";
 import { AccessLevel } from "../generated/prisma/enums";
 import { prisma } from "../prisma/client";
 import { PageService } from "./documentService";
 import crypto from "crypto";
+
+const LIVE_SESSION_DURATION_MS = 24 * 60 * 60 * 1000;
 
 // not being used for now
 export const ShareService = {
@@ -68,44 +69,4 @@ export const ShareLinkService = {
   },
 };
 
-export const LiveSessionService = {
-  async createLiveSession(pageId: string, createdBy: string) {
-    const page = await PageService.getPageById(pageId, createdBy);
-    if (!page) {
-      throw new Error("Page not found");
-    }
-    const existingSession = await LiveSessionRepository.getActiveSessionByPageId(pageId);
-    if (existingSession) {
-      await LiveSessionRepository.endSession(existingSession.id);
-    }
 
-    const inviteToken = crypto.randomUUID();
-    return LiveSessionRepository.createSession(pageId, createdBy, inviteToken);
-  },
-
-  async getLiveSessionByToken(inviteToken: string) {
-    const session = await LiveSessionRepository.getSessionByInviteToken(inviteToken);
-    if (!session || !session.active) {
-      throw new Error("Live session not found or has ended");
-    }
-    return session;
-  },
-
-  async getLiveSessionById(id: string) {
-    return LiveSessionRepository.getSessionById(id);
-  },
-
-  // async getLiveSessionsByPage(pageId: string) {
-  //   return LiveSessionRepository.getActiveSessionByPageId(
-  //     pageId
-  //   )
-  // },
-
-  async getLiveSessionActiveStatus(pageId: string) {
-    return LiveSessionRepository.getActiveSession(pageId);
-  },
-
-  async endLiveSession(id: string) {
-    return LiveSessionRepository.endSession(id);
-  },
-};

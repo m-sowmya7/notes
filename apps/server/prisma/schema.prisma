@@ -63,6 +63,8 @@ model LiveRoom {
   owner        User    @relation(fields: [createdBy], references: [id])
   startedAt   DateTime @default(now())
   endedAt     DateTime?
+  expiresAt   DateTime?
+  yjsState    Bytes?
   @@index([pageId])
 }
 

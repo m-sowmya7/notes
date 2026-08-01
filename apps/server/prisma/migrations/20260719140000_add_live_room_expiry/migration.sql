@@ -1,0 +1,1 @@
+ALTER TABLE "LiveRoom" ADD COLUMN "expiresAt" TIMESTAMP(3);

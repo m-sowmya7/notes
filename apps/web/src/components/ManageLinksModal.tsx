@@ -87,7 +87,7 @@ export default function ManageLinksModal({
 
     return (
         <div className="fixed inset-0 z-999 flex items-center justify-center bg-black/30">
-            <div className="w-[650px] squircle-2xl bg-white shadow-xl">
+            <div className="w-162.5 squircle-2xl bg-white shadow-xl">
                 <div className="flex items-center justify-between border-b px-6 py-4">
                     <h2 className="text-lg font-semibold">
                         Shared Links
@@ -98,7 +98,7 @@ export default function ManageLinksModal({
                     </button>
                 </div>
 
-                <div className="max-h-[450px] overflow-y-auto">
+                <div className="max-h-112.5 overflow-y-auto">
                     {loading ? (
                         <div className="p-8 text-center">
                             Loading...

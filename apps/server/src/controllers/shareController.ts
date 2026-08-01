@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ShareService, ShareLinkService, LiveSessionService } from '../services/shareService';
+import { ShareService, ShareLinkService } from '../services/shareService';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -133,59 +133,67 @@ export const deleteShareLink = async (req: Request, res: Response) => {
 }
 
 // Live session related controllers
-export const createLiveSession = async (req: Request, res: Response) => {
-    try {
-        const { pageId: rawPageId } = req.params;
-        const userId = req.body.userId;
-        const pageId = Array.isArray(rawPageId) ? rawPageId[0] : rawPageId;
-        const session = await LiveSessionService.createLiveSession(pageId, userId);
-        res.status(201).json({
-            ...session,
-            url: `${process.env.FRONTEND_URL}/live/${session.inviteToken}`,
-        });
-    }
-    catch(error) {
-        res.status(500).json({ error: "Failed to create a live session" });
-    }
-}
+// export const createLiveSession = async (req: Request, res: Response) => {
+//     try {
+//         const { pageId: rawPageId } = req.params;
+//         const userId = req.header("x-user-id");
+//         if (!userId) return res.status(400).json({ error: "Missing user id" });
+//         const pageId = Array.isArray(rawPageId) ? rawPageId[0] : rawPageId;
+//         const session = await LiveSessionService.createLiveSession(pageId, userId);
+//         res.status(201).json({
+//             ...session,
+//             url: `${process.env.FRONTEND_URL}/live/${session.inviteToken}`,
+//         });
+//     }
+//     catch(error) {
+//         res.status(500).json({ error: "Failed to create a live session" });
+//     }
+// }
 
 // createLiveSession() -> POST /live/:pageId/start
 // getLiveSession() -> GET /live/invite/:inviteToken
 // getLiveSessionStatus() -> GET /live/page/:pageId
 // endLiveSession() -> PATCH /live/:sessionId/end
 
-export const getLiveSession = async (req: Request, res: Response) => {
-    try {
-        const { inviteToken: rawInviteToken } = req.params;
-        const inviteToken = Array.isArray(rawInviteToken) ? rawInviteToken[0] : rawInviteToken;
-        const session = await LiveSessionService.getLiveSessionByToken(inviteToken);
-        res.status(200).json(session);
-    }
-    catch(error) {
-        res.status(404).json({ error: "Failed to get the session" });
-    }
-}
+// export const getLiveSession = async (req: Request, res: Response) => {
+//     try {
+//         const { inviteToken: rawInviteToken } = req.params;
+//         const inviteToken = Array.isArray(rawInviteToken) ? rawInviteToken[0] : rawInviteToken;
+//         const session = await LiveSessionService.getLiveSessionByToken(inviteToken);
+//         res.status(200).json(session);
+//     }
+//     catch(error) {
+//         res.status(404).json({ error: "Failed to get the session" });
+//     }
+// }
 
-export const getLiveSessionStatus = async (req: Request, res: Response) => {
-    try {
-        const { pageId: rawPageId } = req.params;
-        const pageId = Array.isArray(rawPageId) ? rawPageId[0] : rawPageId;
-        const status = await LiveSessionService.getLiveSessionActiveStatus(pageId);
-        res.status(200).json(status);
-    }
-    catch(error) {
-        res.status(500).json({ error: "Failed to get the session status" });
-    }
-}
+// export const getLiveSessionStatus = async (req: Request, res: Response) => {
+//     try {
+//         const { pageId: rawPageId } = req.params;
+//         const pageId = Array.isArray(rawPageId) ? rawPageId[0] : rawPageId;
+//         const status = await LiveSessionService.getLiveSessionActiveStatus(pageId);
+//         res.status(200).json(status);
+//     }
+//     catch(error) {
+//         res.status(500).json({ error: "Failed to get the session status" });
+//     }
+// }
 
-export const endLiveSession = async (req: Request, res: Response) => {
-    try {
-        const { sessionId: rawSessionId } = req.params;
-        const sessionId = Array.isArray(rawSessionId) ? rawSessionId[0] : rawSessionId;
-        await LiveSessionService.endLiveSession(sessionId);
-        res.status(200).json({ success: true });
-    }
-    catch(error) {
-        res.status(500).json({ error: "Failed to end the session" });
-    }
-}
+// export const endLiveSession = async (req: Request, res: Response) => {
+//     try {
+//         const { sessionId: rawSessionId } = req.params;
+//         const sessionId = Array.isArray(rawSessionId) ? rawSessionId[0] : rawSessionId;
+//         const userId = req.header("x-user-id");
+//         if (!userId) return res.status(400).json({ error: "Missing user id" });
+//         await endLiveRoom(sessionId, userId);
+//         res.status(200).json({ success: true });
+//     }
+//     catch(error) {
+//         const message = error instanceof Error ? error.message : "Failed to end the session";
+//         console.error("Failed to end live session", { sessionId: req.params.sessionId, error });
+//         const status = message === "Only the page owner can end this live session" ? 403
+//             : message === "Live session not found or has ended" ? 404
+//             : 500;
+//         res.status(status).json({ error: message });
+//     }
+// }

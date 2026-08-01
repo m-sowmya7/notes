@@ -1,11 +1,39 @@
-tasks : 
+features : 
 1. download the file in pdf formart so that even if local storage is removed the data can be protected since no account is used for sign up
-3. verify the necessasary files and folders in both ends
-5. recently deleted??? do i have to ?🫠
-6. collaboration for all the editors - yjs, web sockets etc and what are all needed
-
+   and also ability for copy the whole text as markdown. NOTE : both these features are to be implemented only for markdown
+2. for creating pages and files mobile or smaller screens shouldnt be compatible(can be improved in future versions) but the shared pages maybe seen havent really decided on it yet
+3. recently deleted....... do i have to ?🫠
+4. authenticate
+->. verify the necessasary files and folders in both ends and comments
+->. remove the commented code from all the files
+bug reports :
+1. have to refresh everytime in the deployed version to see the changes
+2. there are multiple userids being generated, have to see if they are legit or not
+3. the name column in the User model is staying empty, can i use it or remove it
+4. whats ownerId in the database "page" model
+5. pages are taking so long to load (is that the problem with free tier)
+6. search engine optimization along with ai search maximization
+7. if the page is deleted from the database all the links attached to it will also be deleted from the database
+8. the inactive links of live collaboration have to be removed from the database - does it have to be a cron job?
+9. changing the title without any content is not happening - markdown alone
+10. active session continuation
+11. editing the task in kanban board in live collaboration, its not happening in real time
 --------------------
+live collaboration requirements : 
+SENDER :
+1. share modal pops up and select live collaboration option
+2. instead of the just generating link, give an input field for inputing names or randomly generating the name(the input for name field should not visible for view or edit option)
+3. the page tool bar should show the number of people participating(liveparticipants) and option to end the session so the link will become invalid, the end session button will not be present all the time on the toolbar but inside the share modal
+4. while in a live collaboration, cursors should be present of different colors(assigned just like in excalidraw indicating presence of other members distinctively)
 
+RECIEVER :
+1. as soon as the link is pasted in the browser, a model has to pop up asking what name should be displayed
+2. the reciever should be able to see the same contents of the page as the owner, with real time changes and display of live participants
+3. reciever cant end the session, but even when the reciever goes offline the edits have to persist 
+4. their presence and other people along with the owner who are present on the page should be shown like a coloured cursor
+--------------------------------
+--> rest of the features should not change and check the existing code before generating new lines of code
+--------------------------------------
 and when the person shares their page : 
 1. choose the permissions to be allowed (view, comment[not available for now], and edit, live session)
 2. copy the link and share
@@ -150,3 +178,41 @@ ENDED
 EXPIRED
 
 without another migration.
+
+src/
+├── live/
+│   ├── provider.ts
+│   ├── useLive.ts
+│   ├── LiveContext.tsx
+│   ├── awareness.ts
+│   └── types.ts
+│
+├── pages/
+│   ├── InvitePage.tsx
+│   ├── EditorPage.tsx   (modified)
+│   └── SharedPage.tsx   (modified)
+│
+├── components/
+│   ├── LiveParticipants.tsx
+│   ├── LiveStatus.tsx
+│   ├── LiveToolbar.tsx
+│   ├── JoinLiveModal.tsx
+│   └── LiveSessionDialog.tsx
+│
+├── hooks/
+│   ├── useLiveSession.ts
+│   └── usePresence.ts
+│
+├── services/
+│   └── liveApi.ts
+│
+├── types/
+│   └── live.ts
+│
+├── editors/
+│   ├── MarkdownEditor.tsx   (updated)
+│   ├── ListEditor.tsx       (updated)
+│   └── KanbanEditor.tsx     (updated)
+│
+└── routes/
+    └── AppRoutes.tsx

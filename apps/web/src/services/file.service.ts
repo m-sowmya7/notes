@@ -69,7 +69,9 @@ export const FileService = {
     });
 
     if (!res.ok) {
-      throw new Error("Failed to fetch page");
+      const error = new Error("Failed to fetch page") as Error & { status: number };
+      error.status = res.status;
+      throw error;
     }
 
     return res.json();

@@ -10,11 +10,15 @@ import {
   type NormalizedListItem,
 } from "../utils/listItems";
 import { FileService } from "../services/file.service";
+import { useLiveSession } from "../features/live/hooks/useLiveSession";
+import { usePresence } from "../features/live/hooks/usePresence";
+import LiveCursorOverlay from "../components/live/LiveCursorOverlay";
 
 type ListItem = NormalizedListItem;
 
 const List = () => {
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const liveContainerRef = useRef<HTMLDivElement>(null);
   const { isTemplatesModalOpen } = useTemplatesModal();
   const { id } = useParams();
   const [title, setTitle] = useState("");
@@ -23,8 +27,48 @@ const List = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [loadedPageId, setLoadedPageId] = useState<string | null>(null);
   const lastSavedRef = useRef<string | null>(null);
+  const liveStateHydratedRef = useRef(false);
+  const live = useLiveSession(id);
+  const participants = usePresence(live.connection, live.participantName);
 
   const [items, setItems] = useState<ListItem[]>([createListItem()]);
+  const isLiveMode = live.isLive;
+  const sharedPageMeta = live.document?.getMap<string>("page-meta");
+  const titleRef = useRef(title);
+
+  useEffect(() => {
+    titleRef.current = title;
+  }, [title]);
+
+  useEffect(() => {
+    if (!isLiveMode || !sharedPageMeta) return;
+
+    const applySharedTitle = () => {
+      const nextTitle = sharedPageMeta.get("title");
+      if (typeof nextTitle === "string" && nextTitle !== titleRef.current) {
+        setTitle(nextTitle);
+      }
+    };
+
+    sharedPageMeta.observe(applySharedTitle);
+    applySharedTitle();
+    return () => sharedPageMeta.unobserve(applySharedTitle);
+  }, [isLiveMode, sharedPageMeta]);
+
+  const setInitialTitle = useCallback((initialTitle: string) => {
+    if (!isLiveMode || !sharedPageMeta) {
+      setTitle(initialTitle);
+      return;
+    }
+
+    const existingTitle = sharedPageMeta.get("title");
+    if (typeof existingTitle === "string") {
+      setTitle(existingTitle);
+    } else {
+      sharedPageMeta.set("title", initialTitle);
+      setTitle(initialTitle);
+    }
+  }, [isLiveMode, sharedPageMeta]);
 
   const savePage = useCallback(async (snapshot: string) => {
     if (!id) return;
@@ -62,7 +106,7 @@ const List = () => {
     } catch (error) {
       console.error(error);
     }
-  }, [id, items, starred, title]);
+  }, [id, items, isLiveMode, starred, title]);
 
   const syncPendingPages = async () => {
     try {
@@ -93,7 +137,7 @@ const List = () => {
         const localPage = await db.pages.get(id);
 
         if (!navigator.onLine && localPage) {
-          setTitle(localPage.title);
+          setInitialTitle(localPage.title);
           setStarred(localPage.starred);
           setItems(normalizeListItems(localPage.content.items));
           lastSavedRef.current = JSON.stringify({
@@ -106,7 +150,7 @@ const List = () => {
         }
 
         if (localPage && localPage.pendingSync) {
-          setTitle(localPage.title);
+          setInitialTitle(localPage.title);
           setStarred(localPage.starred);
           setItems(normalizeListItems(localPage.content.items));
           lastSavedRef.current = JSON.stringify({
@@ -129,7 +173,7 @@ const List = () => {
           updatedAt: page.updatedAt,
         });
 
-        setTitle(page.title);
+        setInitialTitle(page.title);
         setStarred(page.starred);
         const normalizedItems = normalizeListItems(page.content.items);
         setItems(normalizedItems);
@@ -145,10 +189,10 @@ const List = () => {
     };
 
     void loadPage();
-  }, [id]);
+  }, [id, isLiveMode, setInitialTitle]);
 
   useEffect(() => {
-    if (!id || loadedPageId !== id) return;
+    if (!id || loadedPageId !== id || isLiveMode) return;
 
     const content = { items: normalizeListItems(items) };
     const snapshot = JSON.stringify({ title, starred, content });
@@ -159,7 +203,7 @@ const List = () => {
     }, 1000);
 
     return () => clearTimeout(timeout);
-  }, [id, items, loadedPageId, savePage, starred, title]);
+  }, [id, items, isLiveMode, loadedPageId, savePage, starred, title]);
 
   useEffect(() => {
     const handleOnline = async () => {
@@ -181,6 +225,7 @@ const List = () => {
   }, []);
 
   useEffect(() => {
+    if (isLiveMode) return;
     if (!navigator.onLine) return;
 
     const sync = async () => {
@@ -190,7 +235,38 @@ const List = () => {
     };
 
     void sync();
-  }, []);
+  }, [isLiveMode]);
+
+  // A map value is an atomic list snapshot. Whole-array delete/insert updates
+  // from separate clients merge into duplicate items in Yjs.
+  useEffect(() => {
+    if (!isLiveMode || !live.document) return;
+
+    const yList = live.document.getMap<unknown>("list-state");
+    liveStateHydratedRef.current = false;
+    const syncFromDocument = () => {
+      const rawItems = yList.get("items") ?? live.document!.getArray("items").toArray();
+      const next = normalizeListItems(rawItems);
+      setItems((current) => JSON.stringify(current) === JSON.stringify(next) ? current : next);
+    };
+
+    syncFromDocument();
+    queueMicrotask(() => { liveStateHydratedRef.current = true; });
+    yList.observe(syncFromDocument);
+    return () => yList.unobserve(syncFromDocument);
+  }, [isLiveMode, live.document]);
+
+  useEffect(() => {
+    if (!isLiveMode || !live.document || !liveStateHydratedRef.current) return;
+
+    const yList = live.document.getMap<unknown>("list-state");
+    const next = normalizeListItems(items);
+    if (JSON.stringify(yList.get("items")) === JSON.stringify(next)) return;
+
+    live.document.transact(() => {
+      yList.set("items", next);
+    });
+  }, [isLiveMode, items, live.document]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === "Enter") {
@@ -240,7 +316,7 @@ const List = () => {
   };
 
   return (
-    <div className={`w-full min-h-screen transition-all duration-200 ${isTemplatesModalOpen ? "blur-sm pointer-events-none" : ""}`}>
+    <div ref={liveContainerRef} className={`w-full min-h-screen transition-all duration-200 ${isTemplatesModalOpen ? "blur-sm pointer-events-none" : ""}`}>
       <PageToolbar
         pageId={id || ""}
         title={title}
@@ -248,12 +324,19 @@ const List = () => {
         isOnline={isOnline}
         isSyncing={isSyncing}
         isModalOpen={isTemplatesModalOpen}
+        liveParticipants={participants}
       />
 
       <div className="mx-auto max-w-3xl px-8 py-10">
         <input
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => {
+            const nextTitle = e.target.value;
+            setTitle(nextTitle);
+            if (isLiveMode && sharedPageMeta?.get("title") !== nextTitle) {
+              sharedPageMeta?.set("title", nextTitle);
+            }
+          }}
           placeholder="Untitled List"
           className="mb-8 w-full border-none bg-transparent text-5xl font-bold text-gray-800 outline-none placeholder:text-gray-400"
         />
@@ -292,6 +375,7 @@ const List = () => {
           Add Item
         </button>
       </div>
+      {isLiveMode && <LiveCursorOverlay live={live.connection} containerRef={liveContainerRef} />}
     </div>
   );
 };
