@@ -28,11 +28,14 @@ async function startServer() {
     //   try { await prisma.$queryRaw`SELECT 1` } catch {}
     // }, 4 * 60 * 1000)
 
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log(`Server running on ${PORT}`);
     });
 
-    startHocuspocusServer();
+    // Start listening for WebSocket upgrades on the same HTTP server the REST
+    // API uses, so live clients connect to the API origin (reachable anywhere
+    // the API is) instead of a hardcoded localhost port.
+    startHocuspocusServer(server);
   } catch (error) {
     console.error("Database connection failed");
     console.error(error);

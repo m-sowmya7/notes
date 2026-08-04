@@ -1,12 +1,11 @@
 import { Logger } from "@hocuspocus/extension-logger";
 import { Server } from "@hocuspocus/server";
+import type { Server as HTTPServer } from "node:http";
 
 import { onAwarenessUpdate, onConnect, onDisconnect } from "./extensions/awareness";
 import { onLoadDocument, onStoreDocument, saveLiveRoomToPage, storeLiveDocument } from "./extensions/persistence";
 import { authorizeLiveRoom, liveRoomName } from "./rooms";
 import { LiveSessionService } from "../services/liveService";
-
-const PORT = Number(process.env.HOCUSPOCUS_PORT ?? 1234);
 
 export const hocuspocus = new Server({
   extensions: [new Logger()],
@@ -57,20 +56,18 @@ async function expireLiveRooms() {
   );
 }
 
-export async function startHocuspocusServer() {
-  try {
-    await hocuspocus.listen(PORT);
+export function startHocuspocusServer(httpServer: HTTPServer) {
+  httpServer.on("upgrade", (request, socket, head) => {
+    hocuspocus.webSocketServer.handleUpgrade(request, socket, head, (ws) => {
+      hocuspocus.webSocketServer.emit("connection", ws, request);
+    });
+  });
 
-    // Expiration is enforced even while clients stay connected. A 60-second
-    // sweep bounds the delay without scheduling one timer per live room.
-    void expireLiveRooms();
-    const expiryTimer = setInterval(() => void expireLiveRooms(), 60_000);
-    expiryTimer.unref();
+  // Expiration is enforced even while clients stay connected. A 60-second
+  // sweep bounds the delay without scheduling one timer per live room.
+  void expireLiveRooms();
+  const expiryTimer = setInterval(() => void expireLiveRooms(), 60_000);
+  expiryTimer.unref();
 
-    console.log(`🚀 Hocuspocus listening on ws://localhost:${PORT}`);
-  } catch (error) {
-    console.error("Failed to start Hocuspocus server");
-    console.error(error);
-    process.exit(1);
-  }
+  console.log("🚀 Hocuspocus attached to API server for live collaboration");
 }

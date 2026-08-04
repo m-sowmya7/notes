@@ -132,6 +132,10 @@ const List = () => {
   useEffect(() => {
     if (!id) return;
 
+    // Invitees are authorized through the live-session token, not the owner's
+    // private page API. The list state will arrive through Yjs below.
+    if (isLiveMode && live.isInvitee) return;
+
     const loadPage = async () => {
       try {
         const localPage = await db.pages.get(id);
