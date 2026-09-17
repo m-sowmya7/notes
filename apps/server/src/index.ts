@@ -5,6 +5,7 @@ import { prisma } from "./prisma/client"; //put this in root directory to remove
 import pageRoutes from "./routes/documentRoutes";
 import userRoutes from "./routes/userRoutes";
 import shareRoutes from "./routes/shareRoutes";
+import healthRoutes from "./routes/healthRoutes";
 import { startHocuspocusServer } from "./live/hocuspocus";
 config();
 
@@ -14,6 +15,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use("/health", healthRoutes);
+app.use("/api/health", healthRoutes);
 app.use("/api/pages", pageRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/share-links", shareRoutes);
